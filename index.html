@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negentropy Labs</title>
+<meta name="description" content="Negentropy Labs: a robotics and AI lab building machines that make order out of chaos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+  :root { --paper: #f3ead6; --ink: #2b2418; --faint: #7a6c55; --rule: #b9a985; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 19px/1.6 "EB Garamond", Georgia, serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 48px 20px 32px; }
+  h1, h2 { font-family: "IM Fell English SC", Georgia, serif; font-weight: 400; letter-spacing: .04em; margin: 0; }
+  h1 { font-size: clamp(2.4rem, 7vw, 4rem); text-align: center; line-height: 1.1; }
+  h2 { font-size: 1.6rem; border-bottom: 1px solid var(--rule); padding-bottom: 6px; margin: 56px 0 16px; }
+  .meta { text-align: center; color: var(--faint); font-style: italic; margin: 8px 0 0; }
+  .tagline { text-align: center; font-size: 1.35rem; margin: 20px 0 0; }
+  hr { border: 0; border-top: 3px double var(--rule); margin: 28px 0; }
+  figure { margin: 24px 0; text-align: center; }
+  figure img { max-width: 100%; height: auto; mix-blend-mode: multiply; }
+  figcaption { font-size: .9rem; color: var(--faint); font-style: italic; margin-top: 6px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  .pair figure { margin: 0; }
+  .photo { border: 1px solid var(--rule); padding: 6px; background: #fbf6ea; mix-blend-mode: normal; }
+  ul { padding-left: 1.2em; }
+  a { color: inherit; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--ink); }
+  footer { max-width: 860px; margin: 40px auto 0; padding: 20px; font-size: .8rem; color: var(--faint); border-top: 1px solid var(--rule); }
+  @media (max-width: 640px) { .pair { grid-template-columns: 1fr; } body { font-size: 18px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Negentropy Labs</h1>
+  <p class="meta">Robotics &amp; Artificial Intelligence · Bhopal, India</p>
+  <p class="tagline">Machines that make order out of chaos.</p>
+  <hr>
+
+  <figure>
+    <img src="img/tesla-sheet1.png" width="700" height="1110" alt="Nikola Tesla's 1898 patent drawing of a remotely controlled boat, seen from above" style="max-width:520px">
+    <figcaption>Fig. 1. N. Tesla, U.S. Patent No. 613,809 (1898): the first radio-controlled vessel.</figcaption>
+  </figure>
+
+  <h2>The Name</h2>
+  <p>Left alone, everything drifts toward disorder. Physicists call that drift <em>entropy</em>. A robot is a small engine that pushes the other way: it sorts, builds, carries and repairs. That push is <em>negentropy</em>, and it is what we build for.</p>
+  <figure>
+    <img src="img/maxwell-demon.png" width="1280" height="472" alt="Diagram of Maxwell's demon sorting fast and slow molecules between two chambers" style="max-width:640px">
+    <figcaption>Fig. 2. Maxwell's demon: a tiny intelligence that sorts molecules and creates order.</figcaption>
+  </figure>
+
+  <h2>What We Are Building</h2>
+  <p><strong>Ciel</strong> is the brain we are building for small robots. It learns how the physical world behaves by watching and moving through it, and it runs on the robot itself, not in a distant data centre.</p>
+  <ul>
+    <li>Low-cost robot hardware that anyone can build.</li>
+    <li>Learning on the device, from the robot's own experience.</li>
+    <li>Open build logs and videos as we go.</li>
+  </ul>
+  <p>We are an early-stage, student-led lab. Work in progress is shared on <a href="https://github.com/divyarthjain">GitHub</a>.</p>
+
+  <h2>Our Lineage</h2>
+  <p>People have built machines that move on their own for centuries. We stand on their shoulders.</p>
+  <div class="pair">
+    <figure>
+      <img class="photo" src="img/tesla-boat.jpg" width="1280" height="960" alt="Replica of Tesla's remote-controlled boat at the Nikola Tesla Museum, Belgrade">
+      <figcaption>Fig. 3. Tesla's "teleautomaton" boat, Nikola Tesla Museum, Belgrade.</figcaption>
+    </figure>
+    <figure>
+      <img src="img/vaucanson-duck.jpg" width="940" height="935" alt="Engraving of the inner mechanism of Vaucanson's mechanical duck">
+      <figcaption>Fig. 4. Vaucanson's mechanical duck (1739), as drawn in <em>Scientific American</em>, 1899.</figcaption>
+    </figure>
+  </div>
+  <figure>
+    <img src="img/tesla-sheet2.png" width="690" height="1090" alt="Side section of Tesla's remotely controlled boat showing batteries, motor and steering" style="max-width:520px">
+    <figcaption>Fig. 5. The same vessel in section: batteries, motor, rudder and receiver.</figcaption>
+  </figure>
+
+  <h2>Contact</h2>
+  <p>Founded by Divyarth Jain.<br>
+  Write to <a href="mailto:negentropy@divyarth.online">negentropy@divyarth.online</a>.</p>
+</main>
+<footer>
+  Images: Fig. 1 &amp; 5, U.S. Patent 613,809, public domain (via Google Patents).
+  Fig. 2, <a href="https://commons.wikimedia.org/wiki/File:Maxwell%27s_demon.svg">Maxwell's demon</a> by Htkym, CC BY 2.5.
+  Fig. 3, <a href="https://commons.wikimedia.org/wiki/File:Bateau_t%C3%A9l%C3%A9commande_de_Nikola_Tesla_(mus%C3%A9e_de_Belgrade).jpg">photo</a> by Boban Markovic, CC BY-SA 4.0.
+  Fig. 4, <a href="https://commons.wikimedia.org/wiki/File:Digesting_Duck.jpg">Digesting Duck</a>, public domain.
+  <br>© Negentropy Labs
+</footer>
+</body>
+</html>
