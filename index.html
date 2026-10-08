@@ -4,89 +4,314 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Divyarth Labs</title>
-<meta name="description" content="Divyarth Labs: a robotics and AI lab building machines that make order out of chaos.">
+<meta name="description" content="Divyarth Labs builds low-cost robots with brains that learn on the device. Incubated at VIT Bhopal.">
+<meta property="og:title" content="Divyarth Labs">
+<meta property="og:description" content="Robots that learn from their own mistakes. Incubated at VIT Bhopal.">
+<meta property="og:image" content="https://divyarth.online/img/tesla-sheet1.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --paper: #f3ead6; --ink: #2b2418; --faint: #7a6c55; --rule: #b9a985; }
+  :root {
+    --paper: #f5efe2; --card: #fbf7ee; --ink: #1f1a12; --muted: #6b604d; --line: #d9ccb0;
+    --accent: #9b2d20; --accent-soft: #f1ddd2;
+  }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font: 19px/1.6 "EB Garamond", Georgia, serif; }
-  main { max-width: 860px; margin: 0 auto; padding: 48px 20px 32px; }
-  h1, h2 { font-family: "IM Fell English SC", Georgia, serif; font-weight: 400; letter-spacing: .04em; margin: 0; }
-  h1 { font-size: clamp(2.4rem, 7vw, 4rem); text-align: center; line-height: 1.1; }
-  h2 { font-size: 1.6rem; border-bottom: 1px solid var(--rule); padding-bottom: 6px; margin: 56px 0 16px; }
-  .meta { text-align: center; color: var(--faint); font-style: italic; margin: 8px 0 0; }
-  .tagline { text-align: center; font-size: 1.35rem; margin: 20px 0 0; }
-  hr { border: 0; border-top: 3px double var(--rule); margin: 28px 0; }
-  figure { margin: 24px 0; text-align: center; }
-  figure img { max-width: 100%; height: auto; mix-blend-mode: multiply; }
-  figcaption { font-size: .9rem; color: var(--faint); font-style: italic; margin-top: 6px; }
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
-  .pair figure { margin: 0; }
-  .photo { border: 1px solid var(--rule); padding: 6px; background: #fbf6ea; mix-blend-mode: normal; }
-  ul { padding-left: 1.2em; }
-  a { color: inherit; text-decoration-color: var(--rule); text-underline-offset: 3px; }
-  a:hover { text-decoration-color: var(--ink); }
-  footer { max-width: 860px; margin: 40px auto 0; padding: 20px; font-size: .8rem; color: var(--faint); border-top: 1px solid var(--rule); }
-  @media (max-width: 640px) { .pair { grid-template-columns: 1fr; } body { font-size: 18px; } }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.6 "Space Grotesk", system-ui, sans-serif; }
+  a { color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+  .mono { font-family: "IBM Plex Mono", monospace; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+  /* nav */
+  nav { position: sticky; top: 0; z-index: 10; background: rgba(245, 239, 226, .92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { font-weight: 700; font-size: 1.15rem; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .logo svg { width: 26px; height: 26px; }
+  .links { display: flex; gap: 28px; align-items: center; }
+  .links a { text-decoration: none; color: var(--muted); font-weight: 500; }
+  .links a:hover { color: var(--ink); }
+  .btn { display: inline-block; padding: 11px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; border: 1.5px solid var(--ink); }
+  .btn-dark { background: var(--ink); color: var(--paper) !important; }
+  .btn-dark:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+  .links .btn { padding: 8px 16px; }
+
+  /* hero */
+  .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; padding-top: 72px; padding-bottom: 56px; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); font-size: .9rem; font-weight: 500; }
+  .badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  h1 { font-size: clamp(2.5rem, 5.5vw, 4.2rem); line-height: 1.05; letter-spacing: -.03em; margin: 20px 0 18px; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lead { font-size: 1.2rem; color: var(--muted); max-width: 34em; margin: 0 0 28px; }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-art { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; text-align: center; }
+  .hero-art img { width: 100%; max-width: 360px; height: auto; mix-blend-mode: multiply; }
+  .hero-art p { margin: 8px 0 0; }
+
+  /* stack strip */
+  .strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 18px 0; }
+  .strip .wrap { display: flex; flex-wrap: wrap; gap: 10px 32px; align-items: center; justify-content: center; }
+  .strip span:not(.mono) { font-weight: 600; color: var(--muted); }
+
+  /* sections */
+  section { padding: 88px 0 0; }
+  h2 { font-size: clamp(1.9rem, 3.5vw, 2.6rem); letter-spacing: -.02em; line-height: 1.15; margin: 8px 0 14px; }
+  .sub { color: var(--muted); max-width: 40em; margin: 0 0 36px; font-size: 1.1rem; }
+
+  .product { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feature { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  .feature .num { font-family: "IBM Plex Mono", monospace; color: var(--accent); font-weight: 500; }
+  .feature h3 { margin: 10px 0 6px; font-size: 1.2rem; }
+  .feature p { margin: 0; color: var(--muted); }
+  .console-link { margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 20px 24px; border-radius: 14px; background: var(--ink); color: var(--paper); }
+  .console-link p { margin: 0; flex: 1; min-width: 240px; }
+  .console-link .btn { border-color: var(--paper); color: var(--paper); }
+  .console-link .btn:hover { background: var(--paper); color: var(--ink); }
+  .pill { display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: .75rem; padding: 3px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); vertical-align: middle; }
+
+  /* work */
+  .work { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; transition: transform .15s, border-color .15s; }
+  .card:hover { transform: translateY(-3px); border-color: var(--ink); }
+  .card h3 { margin: 8px 0 4px; font-size: 1.15rem; }
+  .card .what { margin: 0 0 10px; font-weight: 500; }
+  .card p { margin: 0 0 14px; color: var(--muted); font-size: .95rem; }
+  .chips { margin: auto 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips li { font-family: "IBM Plex Mono", monospace; font-size: .72rem; padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; }
+  .card a.more { margin-top: 12px; font-weight: 600; text-decoration: none; color: var(--accent); }
+
+  /* idea */
+  .idea { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .idea img { width: 100%; height: auto; }
+  .idea p { color: var(--muted); font-size: 1.1rem; }
+
+  /* team */
+  .team { display: grid; grid-template-columns: 320px 1fr; gap: 32px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 32px; }
+  .avatar { width: 88px; height: 88px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-weight: 700; font-size: 1.8rem; }
+  .team h3 { margin: 16px 0 2px; font-size: 1.4rem; }
+  .team ul { margin: 0; padding-left: 1.1em; color: var(--muted); }
+  .team li { margin-bottom: 8px; }
+  .team .social { display: flex; gap: 16px; margin-top: 12px; font-weight: 600; }
+
+  /* contact */
+  .cta { text-align: center; padding: 64px 24px; margin-top: 88px; border-radius: 20px; background: var(--ink); color: var(--paper); }
+  .cta h2 { color: var(--paper); }
+  .cta p { color: #cfc4ae; margin: 0 0 28px; font-size: 1.1rem; }
+  .cta .btn { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+  .cta .btn:hover { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+
+  footer { padding: 40px 0; color: var(--muted); font-size: .85rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+
+  @media (max-width: 900px) {
+    .hero, .idea, .team { grid-template-columns: 1fr; }
+    .product, .work { grid-template-columns: 1fr 1fr; }
+    .hero { padding-top: 48px; }
+  }
+  @media (max-width: 640px) {
+    .links a:not(.btn) { display: none; }
+    .product, .work { grid-template-columns: 1fr; }
+    .team { padding: 22px; }
+    .hero-art img { max-width: 220px; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <h1>Divyarth Labs</h1>
-  <p class="meta">Robotics &amp; Artificial Intelligence · Bhopal, India</p>
-  <p class="tagline">Machines that make order out of chaos.</p>
-  <hr>
 
-  <figure>
-    <img src="img/tesla-sheet1.png" width="700" height="1110" alt="Nikola Tesla's 1898 patent drawing of a remotely controlled boat, seen from above" style="max-width:520px">
-    <figcaption>Fig. 1. N. Tesla, U.S. Patent No. 613,809 (1898): the first radio-controlled vessel.</figcaption>
-  </figure>
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Divyarth Labs home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="7" fill="#1f1a12"/><path d="M9 8h7a8 8 0 0 1 0 16H9z" fill="none" stroke="#f5efe2" stroke-width="2.6"/><circle cx="16" cy="16" r="2.4" fill="#9b2d20"/></svg>
+      Divyarth Labs
+    </a>
+    <div class="links">
+      <a href="#ciel">Ciel</a>
+      <a href="#work">Work</a>
+      <a href="#team">Team</a>
+      <a class="btn btn-dark" href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
 
-  <h2>The Idea</h2>
-  <p>Left alone, everything drifts toward disorder. Physicists call that drift <em>entropy</em>. A robot is a small engine that pushes the other way: it sorts, builds, carries and repairs. That push is <em>negentropy</em>, and it is what we build for.</p>
-  <figure>
-    <img src="img/maxwell-demon.png" width="1280" height="472" alt="Diagram of Maxwell's demon sorting fast and slow molecules between two chambers" style="max-width:640px">
-    <figcaption>Fig. 2. Maxwell's demon: a tiny intelligence that sorts molecules and creates order.</figcaption>
-  </figure>
-
-  <h2>What We Are Building</h2>
-  <p><strong>Ciel</strong> is the brain we are building for small robots. It learns how the physical world behaves by watching and moving through it, and it runs on the robot itself, not in a distant data centre.</p>
-  <ul>
-    <li>Low-cost robot hardware that anyone can build.</li>
-    <li>Learning on the device, from the robot's own experience.</li>
-    <li>Open build logs and videos as we go.</li>
-  </ul>
-  <p>We are an early-stage, student-led lab. Work in progress is shared on <a href="https://github.com/divyarthjain">GitHub</a>.</p>
-
-  <h2>Our Lineage</h2>
-  <p>People have built machines that move on their own for centuries. We stand on their shoulders.</p>
-  <div class="pair">
-    <figure>
-      <img class="photo" src="img/tesla-boat.jpg" width="1280" height="960" alt="Replica of Tesla's remote-controlled boat at the Nikola Tesla Museum, Belgrade">
-      <figcaption>Fig. 3. Tesla's "teleautomaton" boat, Nikola Tesla Museum, Belgrade.</figcaption>
-    </figure>
-    <figure>
-      <img src="img/vaucanson-duck.jpg" width="940" height="935" alt="Engraving of the inner mechanism of Vaucanson's mechanical duck">
-      <figcaption>Fig. 4. Vaucanson's mechanical duck (1739), as drawn in <em>Scientific American</em>, 1899.</figcaption>
+<main id="top">
+  <div class="wrap hero">
+    <div>
+      <span class="badge"><i></i>Incubated at VIT Bhopal</span>
+      <h1>Robots that learn from their <em>own mistakes.</em></h1>
+      <p class="lead">Divyarth Labs builds low-cost robots with brains that run on the robot itself. They predict what will happen, notice when they are wrong, and get better without a data centre.</p>
+      <div class="ctas">
+        <a class="btn btn-dark" href="#ciel">Meet Ciel</a>
+        <a class="btn btn-ghost" href="#work">See our work</a>
+      </div>
+    </div>
+    <figure class="hero-art">
+      <img src="img/tesla-sheet1.png" width="700" height="1110" alt="Nikola Tesla's 1898 patent drawing of the first radio-controlled boat">
+      <p class="mono">Inspired by Tesla's 1898 teleautomaton</p>
     </figure>
   </div>
-  <figure>
-    <img src="img/tesla-sheet2.png" width="690" height="1090" alt="Side section of Tesla's remotely controlled boat showing batteries, motor and steering" style="max-width:520px">
-    <figcaption>Fig. 5. The same vessel in section: batteries, motor, rudder and receiver.</figcaption>
-  </figure>
 
-  <h2>Contact</h2>
-  <p>Founded by Divyarth Jain.<br>
-  Write to <a href="mailto:negentropy@divyarth.online">negentropy@divyarth.online</a>.</p>
+  <div class="strip">
+    <div class="wrap">
+      <span class="mono">Built with</span>
+      <span>ROS 2</span><span>Raspberry Pi</span><span>ESP32</span><span>STM32</span><span>Isaac Sim</span><span>KiCad</span><span>Claude</span>
+    </div>
+  </div>
+
+  <section id="ciel">
+    <div class="wrap">
+      <span class="mono">Product</span>
+      <h2>Ciel: a robot brain that fits on a Raspberry Pi <span class="pill">In development</span></h2>
+      <p class="sub">Most robots are told what to do. Ciel learns how its world behaves by acting in it, and keeps learning when the world changes.</p>
+      <div class="product">
+        <div class="feature">
+          <span class="num">01</span>
+          <h3>Learns on the device</h3>
+          <p>A small world model runs on the robot and learns from its own experience. No cloud round-trip.</p>
+        </div>
+        <div class="feature">
+          <span class="num">02</span>
+          <h3>Adapts to change</h3>
+          <p>New floor, heavier load, worn motor: Ciel notices its predictions are off and re-learns in a few tries.</p>
+        </div>
+        <div class="feature">
+          <span class="num">03</span>
+          <h3>Low-cost hardware</h3>
+          <p>Built for hobby-grade servos, a Pi and a camera, so labs, schools and makers can actually afford it.</p>
+        </div>
+      </div>
+      <div class="console-link">
+        <p><strong>See it think.</strong> Watch the Ciel console predict, get surprised and re-learn.</p>
+        <a class="btn" href="/negentropy/">Open the console →</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="work">
+    <div class="wrap">
+      <span class="mono">Work</span>
+      <h2>What we have built</h2>
+      <p class="sub">Robots, boards and AI systems, designed and built end to end, from the PCB up.</p>
+      <div class="work">
+        <article class="card">
+          <span class="mono">Robotics</span>
+          <h3>Eco-SLAM</h3>
+          <p class="what">Low-cost autonomous mapping rover</p>
+          <p>Replaced LiDAR with a custom 360° array of 8 ToF sensors, cutting sensor cost by 80%. Custom ROS 2 drivers feed Nav2; PPO handles dynamic obstacles.</p>
+          <ul class="chips"><li>ROS 2</li><li>ESP32</li><li>Pi 4</li><li>PPO</li></ul>
+        </article>
+        <article class="card">
+          <span class="mono">Robotics</span>
+          <h3>ArcheoHex</h3>
+          <p class="what">Bio-inspired hexapod explorer</p>
+          <p>A six-legged robot for tight, irregular spaces like archaeological sites. Inverse kinematics written from scratch; on-board MobileNet detection at 88.7% in low light.</p>
+          <ul class="chips"><li>Raspberry Pi</li><li>IK</li><li>Vision</li></ul>
+        </article>
+        <article class="card">
+          <span class="mono">Hardware</span>
+          <h3>Prometheus S3</h3>
+          <p class="what">ESP32-S3 development board</p>
+          <p>Custom PCB with native USB-C JTAG and serial, a clean LDO power rail for Wi-Fi bursts, 50 Ω matched antenna traces and auto-reset flashing.</p>
+          <ul class="chips"><li>KiCad</li><li>ESP32-S3</li><li>RF</li></ul>
+        </article>
+        <article class="card">
+          <span class="mono">Hardware</span>
+          <h3>FPGA RC Fleet</h3>
+          <p class="what">Control latency across architectures</p>
+          <p>The same vehicle driven by FPGA, STM32, ESP8266 and Arduino to compare reaction times, plus an Audio-Bot that steers by directional sound.</p>
+          <ul class="chips"><li>Verilog</li><li>STM32</li><li>C++</li></ul>
+        </article>
+        <article class="card">
+          <span class="mono">Robotics</span>
+          <h3>Pi Flight Controller</h3>
+          <p class="what">Drone control from first principles</p>
+          <p>No Betaflight: a raw C++ PID loop on the Raspberry Pi for 6-axis stabilisation, tuned for microsecond loop times.</p>
+          <ul class="chips"><li>C++</li><li>PID</li><li>Linux</li></ul>
+        </article>
+        <article class="card">
+          <span class="mono">AI Infrastructure</span>
+          <h3>Viv</h3>
+          <p class="what">Private, fully offline AI server</p>
+          <p>Local models behind a VPN and reverse proxy, GraphRAG over a knowledge graph, and near real-time voice via Whisper and TTS.</p>
+          <ul class="chips"><li>Ollama</li><li>Qdrant</li><li>n8n</li><li>Docker</li></ul>
+        </article>
+        <article class="card">
+          <span class="mono">Open Source</span>
+          <h3>VTOP MCP Server</h3>
+          <p class="what">VIT Bhopal's student portal for AI agents</p>
+          <p>19 tools that let Claude and other agents read attendance, marks, timetable and exams, with bunk and OD calculators.</p>
+          <ul class="chips"><li>MCP</li><li>Python</li></ul>
+          <a class="more" href="https://github.com/divyarthjain/vtop-bhopal-mcp">View on GitHub →</a>
+        </article>
+        <article class="card">
+          <span class="mono">IoT</span>
+          <h3>AI CCTV Mesh</h3>
+          <p class="what">Decentralised security grid</p>
+          <p>Low-cost ESP32-CAM nodes on a custom protocol, with a Raspberry Pi hub running real-time pattern recognition.</p>
+          <ul class="chips"><li>ESP32-CAM</li><li>Python</li></ul>
+        </article>
+        <article class="card">
+          <span class="mono">HealthTech</span>
+          <h3>JEEVAN</h3>
+          <p class="what">Emergency trauma response</p>
+          <p>Identifies trauma victims by biometrics and routes them to hospitals with verified free beds. In simulation, identification to admission fell under 20 minutes.</p>
+          <ul class="chips"><li>React Native</li><li>Node.js</li><li>Geo APIs</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap idea">
+      <div>
+        <span class="mono">Why "negentropy"</span>
+        <h2>Machines that make order out of chaos</h2>
+        <p>Left alone, everything drifts toward disorder. Physicists call that entropy. A robot is a small engine that pushes the other way: it sorts, builds, carries and repairs. That push is negentropy, and it is what we build for.</p>
+      </div>
+      <img src="img/maxwell-demon.png" width="1280" height="472" alt="Maxwell's demon sorting fast and slow molecules between two chambers">
+    </div>
+  </section>
+
+  <section id="team">
+    <div class="wrap">
+      <span class="mono">Team</span>
+      <h2>Who is building this</h2>
+      <div class="team">
+        <div>
+          <div class="avatar" aria-hidden="true">DJ</div>
+          <h3>Divyarth Jain</h3>
+          <div class="mono">Founder</div>
+          <div class="social">
+            <a href="https://github.com/divyarthjain">GitHub</a>
+            <a href="https://linkedin.com/in/divyarth-jain">LinkedIn</a>
+          </div>
+        </div>
+        <ul>
+          <li>B.Tech, Electronics &amp; Communication (AI &amp; Cybernetics), VIT Bhopal.</li>
+          <li>Robotics, embedded firmware, PCB design and applied AI, end to end.</li>
+          <li>President, A.I.E.M. Club: runs embedded AI, PCB and robotics workshops for 100+ students.</li>
+          <li>AI Product Intern, QSC Cloud (2025): video personalisation and ML pipelines.</li>
+          <li>Finalist, Caterpillar Autonomy Challenge at IIT Madras, with the rover team.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap" id="contact">
+    <div class="cta">
+      <span class="mono" style="color:#cfc4ae">Contact</span>
+      <h2>Let's build something that moves.</h2>
+      <p>Collaborations, research, pilots or just a good robotics problem: write to us.</p>
+      <a class="btn" href="mailto:negentropy@divyarth.online">negentropy@divyarth.online</a>
+    </div>
+  </div>
 </main>
+
 <footer>
-  Images: Fig. 1 &amp; 5, U.S. Patent 613,809, public domain (via Google Patents).
-  Fig. 2, <a href="https://commons.wikimedia.org/wiki/File:Maxwell%27s_demon.svg">Maxwell's demon</a> by Htkym, CC BY 2.5.
-  Fig. 3, <a href="https://commons.wikimedia.org/wiki/File:Bateau_t%C3%A9l%C3%A9commande_de_Nikola_Tesla_(mus%C3%A9e_de_Belgrade).jpg">photo</a> by Boban Markovic, CC BY-SA 4.0.
-  Fig. 4, <a href="https://commons.wikimedia.org/wiki/File:Digesting_Duck.jpg">Digesting Duck</a>, public domain.
-  <br>© Divyarth Labs
+  <div class="wrap">
+    <span>© 2026 Divyarth Labs · Bhopal, India</span>
+    <span>Images: U.S. Patent 613,809 (public domain); <a href="https://commons.wikimedia.org/wiki/File:Maxwell%27s_demon.svg">Maxwell's demon</a> by Htkym, CC BY 2.5.</span>
+  </div>
 </footer>
 </body>
 </html>
