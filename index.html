@@ -182,13 +182,18 @@ footer h2 span { color: var(--wire); }
   <div class="controls">
     <div class="wrap">
       <div class="modes" role="group" aria-label="Robot motion">
-        <button type="button" id="m-walk" data-mode="walk" aria-pressed="true">Walk</button>
+        <button type="button" id="m-tripod" data-mode="tripod" aria-pressed="true">Tripod</button>
+        <button type="button" id="m-ripple" data-mode="ripple" aria-pressed="false">Ripple</button>
+        <button type="button" id="m-wave" data-mode="wave" aria-pressed="false">Wave gait</button>
+        <button type="button" id="m-crab" data-mode="crab" aria-pressed="false">Crab</button>
         <button type="button" id="m-turn" data-mode="turn" aria-pressed="false">Turn</button>
-        <button type="button" id="m-wave" data-mode="wave" aria-pressed="false">Wave</button>
+        <button type="button" id="m-circle" data-mode="circle" aria-pressed="false">Body circle</button>
+        <button type="button" id="m-pushups" data-mode="pushups" aria-pressed="false">Push-ups</button>
+        <button type="button" id="m-hello" data-mode="hello" aria-pressed="false">Say hi</button>
         <button type="button" id="m-dance" data-mode="dance" aria-pressed="false">Dance</button>
         <button type="button" id="m-stand" data-mode="stand" aria-pressed="false">Stand</button>
       </div>
-      <p class="hint">Tripod gait, live in your browser · drag to rotate · scroll to zoom</p>
+      <p class="hint">Real leg IK in your browser · drag to rotate · scroll to zoom</p>
     </div>
   </div>
 </header>
@@ -758,57 +763,122 @@ document.querySelectorAll('.copy').forEach(function (b) {
       add(tm, geo["tip"], M.tip, [2, sg * 6.25, -112], [Math.PI, 0, 0]);
       servo(tm, [56, sg * 6.25, -18], [0, -57 * D, 0]);
       var tri = (m[0] === 'L1' || m[0] === 'R2' || m[0] === 'L3') ? 0 : 1;
-      legs.push({name: m[0], sg: sg, coxa: coxa, femur: femur, tibia: tibia, tri: tri, a: {c: 0, f: 20, t: -30}});
+      legs.push({name: m[0], sg: sg, coxa: coxa, femur: femur, tibia: tibia, tri: tri, mx: m[1], my: m[2], yaw: m[3] * D, a: {c: 0, f: .3, t: -.55}});
     });
-    status.innerHTML = 'Live 3D · <b>18 servos</b><br>tripod gait';
     resize(); requestAnimationFrame(tick);
   }
 
-  // ---- motion ----
-  var mode = 'walk', t = 0, last = performance.now();
-  var bodyRoll = 0, bodyPitch = 0;
+  // ---- motion: every pose is a foot target in the body frame, solved with leg IK ----
+  // Leg geometry (mm): coxa 43, femur 80, tibia 124 to the foot tip; femur pivot 22 above the coxa origin.
+  var COXA = 43, FZ = 22, LF = 80, LT = Math.hypot(59, 109), AT = Math.atan2(-109, -59);
+  var REACH = 165, FOOTZ = -68;
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function ease(u) { return u * u * (3 - 2 * u); }
-  function target(l, time) {
-    var stand = {c: 0, f: 18 + Math.sin(time * 1.6) * 1.5, t: -32};
-    if (mode === 'walk' || mode === 'turn') {
-      var ph = (time * 0.9 + l.tri * 0.5) % 1, swing = ph < .5, u = swing ? ph / .5 : (ph - .5) / .5;
-      var sweep = swing ? -1 + 2 * ease(u) : 1 - 2 * u;
-      var dir = mode === 'turn' ? 1 : l.sg;
-      var lift = swing ? Math.sin(Math.PI * u) : 0;
-      return {c: 15 * sweep * dir, f: 18 + 24 * lift, t: -32 + 14 * lift};
+  function ik(l, p) {
+    var dx = p.x - l.mx, dy = p.y - l.my;
+    var c = Math.atan2(dy, dx) - l.yaw; c = Math.atan2(Math.sin(c), Math.cos(c));
+    var r = Math.hypot(dx, dy) - COXA, z = p.z - FZ;
+    var d = clamp(Math.hypot(r, z), LT - LF + 2, LF + LT - 2);
+    var psi = -Math.acos(clamp((d * d - LF * LF - LT * LT) / (2 * LF * LT), -1, 1));   // knee up
+    var f = Math.atan2(z, r) - Math.atan2(LT * Math.sin(psi), LF + LT * Math.cos(psi));
+    return {c: c, f: f, t: AT - psi};
+  }
+  // gaits: duty factor (share of the cycle a foot is down), cycle time, phase per leg, body speed (mm/s) and turn rate
+  var TRI = {L1: 0, R2: 0, L3: 0, R1: .5, L2: .5, R3: .5};
+  var GAITS = {
+    tripod: {name: 'Tripod gait', beta: .5, T: 1.0, off: TRI, v: [0, 75], w: 0, lift: 40},
+    ripple: {name: 'Ripple gait', beta: .7, T: 1.5, off: {L1: 0, L2: 1 / 3, L3: 2 / 3, R1: .5, R2: 5 / 6, R3: 1 / 6}, v: [0, 50], w: 0, lift: 36},
+    wave:   {name: 'Wave gait', beta: 5 / 6, T: 2.6, off: {R3: 0, R2: 1 / 6, R1: 2 / 6, L3: 3 / 6, L2: 4 / 6, L1: 5 / 6}, v: [0, 30], w: 0, lift: 44},
+    crab:   {name: 'Crab walk', beta: .5, T: .9, off: TRI, v: [70, 0], w: 0, lift: 36},
+    turn:   {name: 'Turn on the spot', beta: .5, T: 1.1, off: TRI, v: [0, 0], w: .5, lift: 38},
+  };
+  var LABELS = {pushups: 'Push-ups', circle: 'Body circle', hello: 'Hello', dance: 'Dance', stand: 'Standing'};
+  var mode = 'tripod', t = 0, last = performance.now(), modeT = 0, helloLeg = null;
+  var from = null;                                  // joint angles + body pose when the mode changed
+  var bodyPose = {x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0};
+  var mtx = new THREE.Matrix4(), inv = new THREE.Matrix4(), qv = new THREE.Quaternion(), ev = new THREE.Euler(), pv = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1);
+
+  function home(l) { return {x: l.mx + Math.cos(l.yaw) * REACH, y: l.my + Math.sin(l.yaw) * REACH, z: FOOTZ}; }
+  function gaitFoot(l, g, time) {
+    var H = home(l), ph = ((time / g.T + g.off[l.name]) % 1 + 1) % 1;
+    var sx = (g.v[0] - g.w * H.y) * g.T * g.beta, sy = (g.v[1] + g.w * H.x) * g.T * g.beta;
+    if (ph < g.beta) { var u = ph / g.beta; return {x: H.x + sx * (.5 - u), y: H.y + sy * (.5 - u), z: FOOTZ, down: true}; }
+    var s = (ph - g.beta) / (1 - g.beta), e = ease(s);
+    return {x: H.x + sx * (e - .5), y: H.y + sy * (e - .5), z: FOOTZ + g.lift * Math.sin(Math.PI * s), down: false};
+  }
+  function pickHelloLeg() {           // the leg pointing most toward the viewer
+    robot.updateMatrixWorld(true);
+    var c = robot.worldToLocal(cam.position.clone()), a = Math.atan2(c.y, c.x), best = null, bd = -2;
+    legs.forEach(function (l) { var d = Math.cos(l.yaw - a); if (d > bd) { bd = d; best = l; } });
+    return best;
+  }
+  // what every mode wants this frame: body pose + a foot target per leg (in the ground frame under the body)
+  function plan(time) {
+    var g = GAITS[mode], P = {x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0}, feet = {};
+    if (g) {
+      P.z = 3 * Math.cos(time / g.T * Math.PI * 4);
+      legs.forEach(function (l) { feet[l.name] = gaitFoot(l, g, time); });
+      return {P: P, feet: feet, g: g};
     }
-    if (mode === 'wave' && l.name === 'R1') {
-      return {c: 18 + 16 * Math.sin(time * 5), f: 78, t: 10 + 22 * Math.sin(time * 5 + 1)};
+    legs.forEach(function (l) { var h = home(l); h.down = true; feet[l.name] = h; });
+    if (mode === 'stand') { P.z = 2.5 * Math.sin(time * 1.6); }
+    if (mode === 'pushups') {
+      var u = .5 - .5 * Math.cos(time * Math.PI * 2 / 1.7);
+      P.z = -30 * u; P.rx = .05 * u;
     }
-    if (mode === 'wave') return {c: l.name === 'R2' ? -8 : 0, f: 14, t: -34};
+    if (mode === 'circle') {
+      var w = time * 2.2;
+      P.x = 24 * Math.cos(w); P.y = 24 * Math.sin(w);
+      P.ry = .09 * Math.cos(w); P.rx = -.09 * Math.sin(w); P.z = 4 * Math.sin(2 * w);
+    }
     if (mode === 'dance') {
-      var beat = Math.sin(time * 6 + (l.tri ? Math.PI : 0));
-      return {c: 6 * Math.sin(time * 3), f: 18 + 10 * Math.max(0, beat), t: -32 + 6 * beat};
+      var b = Math.sin(time * 7);
+      P.z = 8 + 10 * b; P.rz = .22 * Math.sin(time * 1.75); P.ry = .08 * Math.sin(time * 3.5);
+      legs.forEach(function (l, i) {                // alternate tripods tap to the beat
+        var tap = Math.max(0, Math.sin(time * 3.5 + (l.tri ? Math.PI : 0)));
+        feet[l.name].z = FOOTZ + 26 * tap * tap; feet[l.name].down = tap < .1;
+      });
     }
-    return stand;
+    if (mode === 'hello' && helloLeg) {
+      var hl = helloLeg, ca = Math.cos(hl.yaw), sa = Math.sin(hl.yaw);
+      P.x = -ca * 20; P.y = -sa * 20; P.z = 6;          // lean away from the raised leg
+      P.ry = ca * .07; P.rx = -sa * .07;
+      var sw = Math.sin(time * 6.5);
+      feet[hl.name] = {x: hl.mx + ca * 175 - sa * 45 * sw, y: hl.my + sa * 175 + ca * 45 * sw, z: FOOTZ + 165 + 12 * Math.abs(sw), down: false};
+    }
+    return {P: P, feet: feet};
   }
   var tmp = new THREE.Vector3();
   function tick(now) {
-    var dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
-    var k = 1 - Math.pow(.0005, dt);           // smooth blend between modes
+    var dt = Math.min(.05, (now - last) / 1000); last = now; t += dt; modeT += dt;
+    var p = plan(modeT), P = p.P;
+    // blend from the previous mode over 0.7 s so switching never snaps
+    var k = from ? ease(Math.min(1, modeT / .7)) : 1;
+    if (from) ['x', 'y', 'z', 'rx', 'ry', 'rz'].forEach(function (q) { P[q] = from.P[q] + (P[q] - from.P[q]) * k; });
+    body.position.set(P.x, P.y, P.z); body.rotation.set(P.rx, P.ry, P.rz);
+    qv.setFromEuler(ev.set(P.rx, P.ry, P.rz)); mtx.compose(pv.set(P.x, P.y, P.z), qv, one); inv.copy(mtx).invert();
+    var down = 0;
     legs.forEach(function (l) {
-      var g = target(l, t);
-      l.a.c += (g.c - l.a.c) * k; l.a.f += (g.f - l.a.f) * k; l.a.t += (g.t - l.a.t) * k;
-      l.coxa.rotation.z = l.a.c * D; l.femur.rotation.y = -l.a.f * D; l.tibia.rotation.y = l.a.t * D;
+      var f = p.feet[l.name]; if (f.down) down++;
+      var a = ik(l, tmp.set(f.x, f.y, f.z).applyMatrix4(inv));
+      if (from && k < 1) { var o = from.a[l.name]; a = {c: o.c + (a.c - o.c) * k, f: o.f + (a.f - o.f) * k, t: o.t + (a.t - o.t) * k}; }
+      l.a = a;
+      l.coxa.rotation.z = a.c; l.femur.rotation.y = -a.f; l.tibia.rotation.y = a.t;
     });
-    var tr = 0, tp = 0;
-    if (mode === 'dance') { tr = .09 * Math.sin(t * 3); tp = .06 * Math.sin(t * 3 + 1.2); }
-    if (mode === 'wave') { tp = -.06; tr = -.05; }
-    bodyRoll += (tr - bodyRoll) * k; bodyPitch += (tp - bodyPitch) * k;
-    body.rotation.set(bodyPitch, bodyRoll, 0);
+    if (k >= 1) from = null;
     // keep the lowest foot on the ground
     robot.position.y = 0; robot.updateMatrixWorld(true);
     var minY = Infinity;
     legs.forEach(function (l) { l.tibia.localToWorld(tmp.set(-59, 0, -109)); if (tmp.y < minY) minY = tmp.y; });
     robot.position.y = -minY;
-    // treadmill grid
-    if (mode === 'walk') { grid.position.z = (grid.position.z + dt * 60) % 50; }
-    if (mode === 'turn') { grid.rotation.y -= dt * .25; }
+    // ground slides under the robot at the body's speed (robot +y is scene -z)
+    var g = p.g;
+    if (g) {
+      grid.position.x = ((grid.position.x - g.v[0] * dt) % 50 + 50) % 50;
+      grid.position.z = ((grid.position.z + g.v[1] * dt) % 50 + 50) % 50;
+      grid.rotation.y -= g.w * dt;
+    }
+    status.innerHTML = 'Live IK · <b>' + (g ? g.name : LABELS[mode]) + '</b><br>' + down + ' of 6 feet down';
     controls.update();
     renderer.render(scene, cam);
     requestAnimationFrame(tick);
@@ -826,10 +896,16 @@ document.querySelectorAll('.copy').forEach(function (b) {
 
   document.querySelectorAll('.modes button').forEach(function (b) {
     b.addEventListener('click', function () {
-      mode = b.getAttribute('data-mode');
+      var next = b.getAttribute('data-mode');
+      if (!legs.length) return;
+      var snap = {P: {x: body.position.x, y: body.position.y, z: body.position.z, rx: body.rotation.x, ry: body.rotation.y, rz: body.rotation.z}, a: {}};
+      legs.forEach(function (l) { snap.a[l.name] = l.a; });
+      from = snap; mode = next; modeT = 0;
+      if (mode === 'hello') { controls.autoRotate = false; helloLeg = pickHelloLeg(); } else helloLeg = null;
       document.querySelectorAll('.modes button').forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
     });
   });
+  controls.addEventListener('end', function () { if (mode === 'hello') { helloLeg = pickHelloLeg(); } });
 })();
 </script>
 </body></html>
