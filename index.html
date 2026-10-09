@@ -177,7 +177,7 @@ footer h2 span { color: var(--wire); }
   <section id="hexapod">
     <div class="wrap">
       <div class="head">
-        <p class="label">Hexapod · 2024</p>
+        <p class="label">Hexapod v1 · 2024</p>
         <h2>From a wire mess<br>to first steps</h2>
         <p>18 servos, six legs, a lot of jumper wire. Inverse kinematics written from scratch, tuned until it stood up and walked across the lab.</p>
       </div>
@@ -204,6 +204,43 @@ footer h2 span { color: var(--wire); }
           <img src="assets/hex_stand.jpg" alt="The hexapod standing on a table, viewed from above." loading="lazy">
           <figcaption><b>Standing pose</b><span>Body level, all six feet down.</span></figcaption>
         </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- HEXAPOD V2 -->
+  <section id="hexapod-v2">
+    <div class="wrap">
+      <div class="head">
+        <p class="label">Hexapod v2 · 2nd–3rd year</p>
+        <h2>The best hexapod<br>my budget could buy</h2>
+        <p>Second build, done properly: a printed frame, split power, a heads-up display and an Xbox controller. Open-source hexapod firmware ported to my hardware, with smoother gaits added on top.</p>
+      </div>
+      <div class="wall">
+        <figure class="tile s-wide" style="grid-row: span 7">
+          <video src="assets/hex2-top.mp4" poster="assets/hex2-top.jpg" muted loop playsinline preload="metadata"></video>
+          <span class="tag">Video</span>
+          <figcaption><b>Walking, from above</b><span>Walking across a tiled floor.</span></figcaption>
+        </figure>
+        <figure class="tile s-tall" style="grid-row: span 13">
+          <video src="assets/hex2-floor.mp4" poster="assets/hex2-floor.jpg" muted loop playsinline preload="metadata" style="object-position: 50% 85%"></video>
+          <span class="tag">Video</span>
+          <figcaption><b>Floor test</b><span>Walking test at home.</span></figcaption>
+        </figure>
+        <figure class="tile s-third" style="grid-row: span 6">
+          <img src="assets/hex2-front.jpg" alt="Black 3D-printed hexapod with red braided cables standing on a wooden table." loading="lazy">
+          <figcaption><b>Standing</b><span>18 servos, red braided power runs.</span></figcaption>
+        </figure>
+        <figure class="tile s-third" style="grid-row: span 6">
+          <img src="assets/hex2-above.jpg" alt="Hexapod seen from above: body cover with a window onto the controller board, six legs spread out." loading="lazy">
+          <figcaption><b>From above</b><span>Controller visible through the body window.</span></figcaption>
+        </figure>
+      </div>
+      <div class="nums">
+        <div><b>RP2040</b><span>Zero runs the gait engine</span></div>
+        <div><b>2×</b><span>PCA9685 boards drive 18 servos</span></div>
+        <div><b>ESP32</b><span>for the HUD and Xbox controller link</span></div>
+        <div><b>3</b><span>UBECs to keep the servo supply stable</span></div>
       </div>
     </div>
   </section>
@@ -424,7 +461,7 @@ document.querySelectorAll('.copy').forEach(function (b) {
   function build() {
     add(body, geo["frame"], M.dark);
     add(body, geo["top-cover"], M.shell, [0, 0, 16]);
-    add(body, geo["bottom-cover"], M.shell);
+    add(body, geo["bottom-cover"], M.shell, [0, 0, 16]);   // tray sits flush under the frame
     MOUNTS.forEach(function (m) {
       var sg = m[0][0] === 'L' ? -1 : 1, side = sg < 0 ? 'left' : 'right';
       var mount = new THREE.Group(); mount.position.set(m[1], m[2], 0); mount.rotation.z = m[3] * D; body.add(mount);
@@ -437,8 +474,12 @@ document.querySelectorAll('.copy').forEach(function (b) {
       var tibia = new THREE.Group(); tibia.position.set(80, 0, 0); femur.add(tibia);
       var tm = new THREE.Group(); tm.position.set(-61, -sg * 6.25, 9); tibia.add(tm);
       add(tm, geo[side + "-tibia"], M.shell);
-      var sh = add(tm, geo["shield"], sg > 0 ? M.shellDS : M.shell); if (sg > 0) sh.scale.y = -1;
-      sh.rotation.z = Math.PI; sh.position.set(6, sg * 12.5, 0);   // cover faces outward
+      // leg cover: flipped 180 deg about the tibia's own axis (foot -> knee) so it faces out and follows the leg
+      var sh = new THREE.Mesh(geo["shield"], sg > 0 ? M.shellDS : M.shell); sh.castShadow = sh.receiveShadow = true;
+      if (sg > 0) sh.scale.y = -1;
+      var P = new THREE.Vector3(2, sg * 6.25, -110), piv = new THREE.Group();
+      piv.position.copy(P); piv.quaternion.setFromAxisAngle(new THREE.Vector3(59, 0, 101).normalize(), Math.PI);
+      sh.position.set(-P.x, -P.y, -P.z); piv.add(sh); tm.add(piv);
       add(tm, geo["tip"], M.tip, [2, sg * 6.25, -112], [Math.PI, 0, 0]);
       servo(tm, [56, sg * 6.25, -18], [0, -57 * D, 0]);
       var tri = (m[0] === 'L1' || m[0] === 'R2' || m[0] === 'L3') ? 0 : 1;
