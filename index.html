@@ -1,317 +1,519 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Divyarth Labs</title>
-<meta name="description" content="Divyarth Labs builds low-cost robots with brains that learn on the device. Incubated at VIT Bhopal.">
-<meta property="og:title" content="Divyarth Labs">
-<meta property="og:description" content="Robots that learn from their own mistakes. Incubated at VIT Bhopal.">
-<meta property="og:image" content="https://divyarth.online/img/tesla-sheet1.png">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Divyarth Jain</title>
+<meta name="description" content="Divyarth Jain builds robots and the boards that run them: hexapods, robot arms, servo driver PCBs.">
+<meta property="og:title" content="Divyarth Jain: robots and the boards that run them">
+<meta property="og:description" content="Hexapods, robot arms, servo driver PCBs, and a capstone robot that learns from surprise.">
+<meta property="og:image" content="https://divyarth.online/assets/og.jpg">
+<meta property="og:url" content="https://divyarth.online/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<!-- 3D model: hexapod frame parts are MIT-licensed, see assets/hexapod-LICENSE.txt -->
 <style>
-  :root {
-    --paper: #f5efe2; --card: #fbf7ee; --ink: #1f1a12; --muted: #6b604d; --line: #d9ccb0;
-    --accent: #9b2d20; --accent-soft: #f1ddd2;
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.6 "Space Grotesk", system-ui, sans-serif; }
-  a { color: inherit; }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
-  .mono { font-family: "IBM Plex Mono", monospace; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+/* Layout: a dark workshop stage. The live robot is the hero; everything below is a photo/video wall with short captions. */
+:root {
+  --bg: #0D0E10;
+  --bg2: #16181B;
+  --ink: #F1EEE8;
+  --muted: #9A9893;
+  --line: #2A2C30;
+  --wire: #FF6A1A;     /* servo-cable orange */
+  --wire2: #C2361B;    /* servo-cable red */
+  --wire3: #6B3A1E;    /* servo-cable brown */
+  --f-display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 400 1rem/1.55 var(--f-body); margin: 0; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--wire); outline-offset: 3px; }
+img, video { display: block; max-width: 100%; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; }
+@media (min-width: 700px) { .wrap { padding-inline: 32px; } }
 
-  /* nav */
-  nav { position: sticky; top: 0; z-index: 10; background: rgba(245, 239, 226, .92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
-  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-  .logo { font-weight: 700; font-size: 1.15rem; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-  .logo svg { width: 26px; height: 26px; }
-  .links { display: flex; gap: 28px; align-items: center; }
-  .links a { text-decoration: none; color: var(--muted); font-weight: 500; }
-  .links a:hover { color: var(--ink); }
-  .btn { display: inline-block; padding: 11px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; border: 1.5px solid var(--ink); }
-  .btn-dark { background: var(--ink); color: var(--paper) !important; }
-  .btn-dark:hover { background: var(--accent); border-color: var(--accent); }
-  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
-  .links .btn { padding: 8px 16px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
+.label { font: 500 .72rem/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.cable { display: flex; gap: 3px; width: 54px; }
+.cable i { height: 4px; flex: 1; }
+.cable i:nth-child(1) { background: var(--wire3); }
+.cable i:nth-child(2) { background: var(--wire2); }
+.cable i:nth-child(3) { background: var(--wire); }
 
-  /* hero */
-  .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; padding-top: 72px; padding-bottom: 56px; }
-  .badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); font-size: .9rem; font-weight: 500; }
-  .badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-  h1 { font-size: clamp(2.5rem, 5.5vw, 4.2rem); line-height: 1.05; letter-spacing: -.03em; margin: 20px 0 18px; }
-  h1 em { font-style: normal; color: var(--accent); }
-  .lead { font-size: 1.2rem; color: var(--muted); max-width: 34em; margin: 0 0 28px; }
-  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
-  .hero-art { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; text-align: center; }
-  .hero-art img { width: 100%; max-width: 360px; height: auto; mix-blend-mode: multiply; }
-  .hero-art p { margin: 8px 0 0; }
+/* ---------- hero stage ---------- */
+.stage { position: relative; height: clamp(520px, 86vh, 820px); background: radial-gradient(120% 90% at 50% 70%, #1E2024 0%, var(--bg) 70%); overflow: hidden; border-bottom: 1px solid var(--line); }
+#hex { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+.stage .fallback { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .35; }
+.hero-copy { position: absolute; left: 0; right: 0; top: 0; pointer-events: none; padding-top: clamp(20px, 4vw, 44px); }
+.hero-copy h1 { font-size: clamp(3.4rem, 13vw, 10.5rem); font-weight: 900; font-stretch: 62%; line-height: .82; letter-spacing: -.01em; text-transform: uppercase; }
+.hero-copy h1 span { display: block; color: var(--wire); }
+.hero-copy p { margin: 16px 0 0; max-width: 34ch; color: var(--ink); font-size: 1.05rem; }
+.hero-copy .label { margin-bottom: 14px; display: flex; gap: 12px; align-items: center; }
+.controls { position: absolute; left: 0; right: 0; bottom: 0; padding-bottom: 20px; }
+.controls .wrap { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: space-between; }
+.modes { display: flex; flex-wrap: wrap; gap: 6px; }
+.modes button {
+  font: 600 .82rem/1 var(--f-body); letter-spacing: .02em; color: var(--ink); background: rgba(13,14,16,.6);
+  border: 1px solid var(--line); padding: 10px 14px; cursor: pointer; backdrop-filter: blur(6px);
+}
+.modes button:hover { border-color: var(--muted); }
+.modes button[aria-pressed="true"] { background: var(--wire); border-color: var(--wire); color: #140A04; }
+.hint { font: 400 .74rem/1.4 var(--f-mono); color: var(--muted); }
+.status { position: absolute; right: 16px; top: 16px; font: 500 .72rem/1.3 var(--f-mono); color: var(--muted); text-align: right; }
+@media (min-width: 700px) { .status { right: 32px; top: 28px; } }
+.status b { color: var(--wire); font-weight: 500; }
 
-  /* stack strip */
-  .strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 18px 0; }
-  .strip .wrap { display: flex; flex-wrap: wrap; gap: 10px 32px; align-items: center; justify-content: center; }
-  .strip span:not(.mono) { font-weight: 600; color: var(--muted); }
+/* ---------- sections ---------- */
+section { padding-block: clamp(56px, 8vw, 110px) 0; }
+.head { display: grid; gap: 12px; margin-bottom: 26px; }
+.head h2 { font-size: clamp(2.2rem, 6vw, 4.6rem); font-weight: 850; font-stretch: 70%; line-height: .92; text-transform: uppercase; }
+.head p { margin: 0; max-width: 60ch; color: var(--muted); font-size: 1.02rem; }
 
-  /* sections */
-  section { padding: 88px 0 0; }
-  h2 { font-size: clamp(1.9rem, 3.5vw, 2.6rem); letter-spacing: -.02em; line-height: 1.15; margin: 8px 0 14px; }
-  .sub { color: var(--muted); max-width: 40em; margin: 0 0 36px; font-size: 1.1rem; }
+/* tile wall */
+.wall { display: grid; gap: 10px; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: 64px; }
+.tile { position: relative; overflow: hidden; background: var(--bg2); border: 1px solid var(--line); margin: 0; min-width: 0; }
+.tile > img, .tile > video { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+.tile:hover > img, .tile:hover > video { transform: scale(1.035); }
+.tile figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 28px 14px 12px;
+  background: linear-gradient(to top, rgba(8,8,9,.88), rgba(8,8,9,0)); font-size: .9rem; line-height: 1.35;
+}
+.tile figcaption b { display: block; font: 700 1.05rem/1.15 var(--f-display); font-stretch: 85%; text-transform: uppercase; letter-spacing: .01em; margin-bottom: 2px; }
+.tile figcaption span { color: #CFCAC2; }
+.tile .tag { position: absolute; top: 10px; left: 10px; font: 500 .66rem/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; background: var(--wire); color: #140A04; padding: 5px 7px; }
+.tile.paper { background: #F4F2EE; }
+.tile.paper > img { object-fit: contain; padding: 10px; }
+.tile.paper figcaption { background: linear-gradient(to top, rgba(8,8,9,.9), rgba(8,8,9,0)); }
 
-  .product { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .feature { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
-  .feature .num { font-family: "IBM Plex Mono", monospace; color: var(--accent); font-weight: 500; }
-  .feature h3 { margin: 10px 0 6px; font-size: 1.2rem; }
-  .feature p { margin: 0; color: var(--muted); }
-  .console-link { margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 20px 24px; border-radius: 14px; background: var(--ink); color: var(--paper); }
-  .console-link p { margin: 0; flex: 1; min-width: 240px; }
-  .console-link .btn { border-color: var(--paper); color: var(--paper); }
-  .console-link .btn:hover { background: var(--paper); color: var(--ink); }
-  .pill { display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: .75rem; padding: 3px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); vertical-align: middle; }
+/* spans (desktop) */
+.s-tall { grid-column: span 4; grid-row: span 9; }
+.s-mid  { grid-column: span 4; grid-row: span 6; }
+.s-wide { grid-column: span 8; grid-row: span 6; }
+.s-half { grid-column: span 6; grid-row: span 5; }
+.s-full { grid-column: span 12; grid-row: span 8; }
+.s-third { grid-column: span 4; grid-row: span 5; }
+.s-sq { grid-column: span 4; grid-row: span 3; }
 
-  /* work */
-  .work { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; transition: transform .15s, border-color .15s; }
-  .card:hover { transform: translateY(-3px); border-color: var(--ink); }
-  .card h3 { margin: 8px 0 4px; font-size: 1.15rem; }
-  .card .what { margin: 0 0 10px; font-weight: 500; }
-  .card p { margin: 0 0 14px; color: var(--muted); font-size: .95rem; }
-  .chips { margin: auto 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
-  .chips li { font-family: "IBM Plex Mono", monospace; font-size: .72rem; padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; }
-  .card a.more { margin-top: 12px; font-weight: 600; text-decoration: none; color: var(--accent); }
+/* number strip */
+.nums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 10px; }
+.nums div { padding: 18px 16px; border-left: 1px solid var(--line); display: grid; gap: 4px; min-width: 0; }
+.nums div:first-child { border-left: 0; }
+.nums b { font: 850 clamp(1.8rem, 4vw, 2.8rem)/1 var(--f-display); font-stretch: 75%; color: var(--wire); font-variant-numeric: tabular-nums; }
+.nums span { font-size: .85rem; color: var(--muted); line-height: 1.35; }
 
-  /* idea */
-  .idea { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-  .idea img { width: 100%; height: auto; }
-  .idea p { color: var(--muted); font-size: 1.1rem; }
+.textcard { background: var(--bg2); border: 1px solid var(--line); padding: 20px; display: grid; gap: 10px; align-content: start; }
+.textcard h3 { font-size: 1.5rem; font-weight: 800; font-stretch: 75%; text-transform: uppercase; line-height: 1; }
+.textcard p { margin: 0; font-size: .95rem; color: #D6D1C9; }
+.textcard .label { color: var(--wire); }
 
-  /* team */
-  .team { display: grid; grid-template-columns: 320px 1fr; gap: 32px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 32px; }
-  .avatar { width: 88px; height: 88px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-weight: 700; font-size: 1.8rem; }
-  .team h3 { margin: 16px 0 2px; font-size: 1.4rem; }
-  .team ul { margin: 0; padding-left: 1.1em; color: var(--muted); }
-  .team li { margin-bottom: 8px; }
-  .team .social { display: flex; gap: 16px; margin-top: 12px; font-weight: 600; }
+.paperline { margin-top: 18px; display: grid; gap: 8px; max-width: 80ch; }
+.paperline h3 { font: 600 1.15rem/1.35 var(--f-body); }
+.chip { display: inline-block; font: 500 .7rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--wire); color: var(--wire); padding: 5px 8px; }
 
-  /* contact */
-  .cta { text-align: center; padding: 64px 24px; margin-top: 88px; border-radius: 20px; background: var(--ink); color: var(--paper); }
-  .cta h2 { color: var(--paper); }
-  .cta p { color: #cfc4ae; margin: 0 0 28px; font-size: 1.1rem; }
-  .cta .btn { background: var(--paper); color: var(--ink); border-color: var(--paper); }
-  .cta .btn:hover { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+footer { margin-top: clamp(70px, 9vw, 120px); border-top: 1px solid var(--line); padding-block: 40px 56px; }
+footer .wrap { display: grid; gap: 24px; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: end; }
+footer h2 { font-size: clamp(2.4rem, 7vw, 5rem); font-weight: 900; font-stretch: 62%; line-height: .88; text-transform: uppercase; }
+footer h2 span { color: var(--wire); }
+.contact { display: grid; gap: 8px; font-size: .98rem; }
+.contact .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.contact .mono { font-family: var(--f-mono); font-size: .9rem; }
+.btn { display: inline-block; background: var(--wire); color: #140A04; font: 700 .92rem/1 var(--f-body); padding: 12px 18px; text-decoration: none; }
+.btn.ghost { background: none; color: var(--ink); border: 1px solid var(--line); }
+.copy { font: 500 .72rem/1 var(--f-mono); background: none; border: 1px solid var(--line); color: var(--muted); padding: 4px 7px; cursor: pointer; }
 
-  footer { padding: 40px 0; color: var(--muted); font-size: .85rem; }
-  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
-
-  @media (max-width: 900px) {
-    .hero, .idea, .team { grid-template-columns: 1fr; }
-    .product, .work { grid-template-columns: 1fr 1fr; }
-    .hero { padding-top: 48px; }
-  }
-  @media (max-width: 640px) {
-    .links a:not(.btn) { display: none; }
-    .product, .work { grid-template-columns: 1fr; }
-    .team { padding: 22px; }
-    .hero-art img { max-width: 220px; }
-  }
+@media (max-width: 900px) {
+  .wall { grid-auto-rows: 56px; }
+  .s-tall { grid-column: span 6; grid-row: span 9; }
+  .s-mid, .s-third { grid-column: span 6; grid-row: span 5; }
+  .s-wide, .s-half { grid-column: span 12; grid-row: span 6; }
+  .s-sq { grid-column: span 6; grid-row: span 3; }
+  .nums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nums div:nth-child(3) { border-left: 0; }
+  .nums div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  footer .wrap { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .s-tall { grid-column: span 12; grid-row: span 10; }
+  .s-mid, .s-third, .s-sq { grid-column: span 12; grid-row: span 6; }
+  .s-full { grid-row: span 5; }
+  .status { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile > img, .tile > video { transition: none; }
+}
 </style>
-</head>
-<body>
+</head><body>
 
-<nav>
-  <div class="wrap">
-    <a class="logo" href="#top" aria-label="Divyarth Labs home">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="7" fill="#1f1a12"/><path d="M9 8h7a8 8 0 0 1 0 16H9z" fill="none" stroke="#f5efe2" stroke-width="2.6"/><circle cx="16" cy="16" r="2.4" fill="#9b2d20"/></svg>
-      Divyarth Labs
-    </a>
-    <div class="links">
-      <a href="#ciel">Ciel</a>
-      <a href="#work">Work</a>
-      <a href="#team">Team</a>
-      <a class="btn btn-dark" href="#contact">Contact</a>
-    </div>
-  </div>
-</nav>
-
-<main id="top">
-  <div class="wrap hero">
-    <div>
-      <span class="badge"><i></i>Incubated at VIT Bhopal</span>
-      <h1>Robots that learn from their <em>own mistakes.</em></h1>
-      <p class="lead">Divyarth Labs builds low-cost robots with brains that run on the robot itself. They predict what will happen, notice when they are wrong, and get better without a data centre.</p>
-      <div class="ctas">
-        <a class="btn btn-dark" href="#ciel">Meet Ciel</a>
-        <a class="btn btn-ghost" href="#work">See our work</a>
-      </div>
-    </div>
-    <figure class="hero-art">
-      <img src="img/tesla-sheet1.png" width="700" height="1110" alt="Nikola Tesla's 1898 patent drawing of the first radio-controlled boat">
-      <p class="mono">Inspired by Tesla's 1898 teleautomaton</p>
-    </figure>
-  </div>
-
-  <div class="strip">
+<header class="stage" id="top">
+  <img class="fallback" id="fallback" src="assets/hex-walk.jpg" alt="" hidden>
+  <canvas id="hex" aria-label="Interactive 3D model of an 18-servo hexapod robot. Drag to rotate."></canvas>
+  <div class="hero-copy">
     <div class="wrap">
-      <span class="mono">Built with</span>
-      <span>ROS 2</span><span>Raspberry Pi</span><span>ESP32</span><span>STM32</span><span>Isaac Sim</span><span>KiCad</span><span>Claude</span>
+      <p class="label"><span class="cable" aria-hidden="true"><i></i><i></i><i></i></span>ECE · VIT Bhopal · PCB + robotics</p>
+      <h1>Divyarth<span>Jain</span></h1>
+      <p>I build robots and the boards that run them. Drag the hexapod around, or make it dance.</p>
     </div>
   </div>
-
-  <section id="ciel">
+  <p class="status" id="status">Loading robot <b id="pct">0%</b><br>18 servos · 3 per leg</p>
+  <div class="controls">
     <div class="wrap">
-      <span class="mono">Product</span>
-      <h2>Ciel: a robot brain that fits on a Raspberry Pi <span class="pill">In development</span></h2>
-      <p class="sub">Most robots are told what to do. Ciel learns how its world behaves by acting in it, and keeps learning when the world changes.</p>
-      <div class="product">
-        <div class="feature">
-          <span class="num">01</span>
-          <h3>Learns on the device</h3>
-          <p>A small world model runs on the robot and learns from its own experience. No cloud round-trip.</p>
-        </div>
-        <div class="feature">
-          <span class="num">02</span>
-          <h3>Adapts to change</h3>
-          <p>New floor, heavier load, worn motor: Ciel notices its predictions are off and re-learns in a few tries.</p>
-        </div>
-        <div class="feature">
-          <span class="num">03</span>
-          <h3>Low-cost hardware</h3>
-          <p>Built for hobby-grade servos, a Pi and a camera, so labs, schools and makers can actually afford it.</p>
-        </div>
+      <div class="modes" role="group" aria-label="Robot motion">
+        <button type="button" id="m-walk" data-mode="walk" aria-pressed="true">Walk</button>
+        <button type="button" id="m-turn" data-mode="turn" aria-pressed="false">Turn</button>
+        <button type="button" id="m-wave" data-mode="wave" aria-pressed="false">Wave</button>
+        <button type="button" id="m-dance" data-mode="dance" aria-pressed="false">Dance</button>
+        <button type="button" id="m-stand" data-mode="stand" aria-pressed="false">Stand</button>
       </div>
-      <div class="console-link">
-        <p><strong>See it think.</strong> Watch the Ciel console predict, get surprised and re-learn.</p>
-        <a class="btn" href="/negentropy/">Open the console →</a>
+      <p class="hint">Tripod gait, live in your browser · drag to rotate · scroll to zoom</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HEXAPOD IRL -->
+  <section id="hexapod">
+    <div class="wrap">
+      <div class="head">
+        <p class="label">Hexapod · 2024</p>
+        <h2>From a wire mess<br>to first steps</h2>
+        <p>18 servos, six legs, a lot of jumper wire. Inverse kinematics written from scratch, tuned until it stood up and walked across the lab.</p>
+      </div>
+      <div class="wall">
+        <figure class="tile s-tall">
+          <video src="assets/hex-walk.mp4" poster="assets/hex-walk.jpg" muted loop playsinline preload="metadata"></video>
+          <span class="tag">Video</span>
+          <figcaption><b>Walking</b><span>Tripod gait across the lab floor.</span></figcaption>
+        </figure>
+        <figure class="tile s-tall">
+          <img src="assets/hex-wiring.jpg" alt="Hexapod with an Arduino on a breadboard and bundles of servo wires, dated 11 March 2024." loading="lazy">
+          <figcaption><b>11 March 2024</b><span>Every servo wired. Nothing moves yet.</span></figcaption>
+        </figure>
+        <figure class="tile s-tall">
+          <img src="assets/hex-desk.jpg" alt="Hexapod on a lab desk beside a laptop running code." loading="lazy">
+          <figcaption><b>Debug days</b><span>Gait code on the laptop, robot on the bench.</span></figcaption>
+        </figure>
+        <figure class="tile s-wide">
+          <video src="assets/hex-table.mp4" poster="assets/hex-table.jpg" muted loop playsinline preload="metadata"></video>
+          <span class="tag">Video</span>
+          <figcaption><b>Bench test</b><span>Six legs, 18 servos, one very busy wiring harness.</span></figcaption>
+        </figure>
+        <figure class="tile s-mid">
+          <img src="assets/hex_stand.jpg" alt="The hexapod standing on a table, viewed from above." loading="lazy">
+          <figcaption><b>Standing pose</b><span>Body level, all six feet down.</span></figcaption>
+        </figure>
       </div>
     </div>
   </section>
 
-  <section id="work">
+  <!-- PCB -->
+  <section id="pcb">
     <div class="wrap">
-      <span class="mono">Work</span>
-      <h2>What we have built</h2>
-      <p class="sub">Robots, boards and AI systems, designed and built end to end, from the PCB up.</p>
-      <div class="work">
-        <article class="card">
-          <span class="mono">Robotics</span>
-          <h3>Eco-SLAM</h3>
-          <p class="what">Low-cost autonomous mapping rover</p>
-          <p>Replaced LiDAR with a custom 360° array of 8 ToF sensors, cutting sensor cost by 80%. Custom ROS 2 drivers feed Nav2; PPO handles dynamic obstacles.</p>
-          <ul class="chips"><li>ROS 2</li><li>ESP32</li><li>Pi 4</li><li>PPO</li></ul>
-        </article>
-        <article class="card">
-          <span class="mono">Robotics</span>
-          <h3>ArcheoHex</h3>
-          <p class="what">Bio-inspired hexapod explorer</p>
-          <p>A six-legged robot for tight, irregular spaces like archaeological sites. Inverse kinematics written from scratch; on-board MobileNet detection at 88.7% in low light.</p>
-          <ul class="chips"><li>Raspberry Pi</li><li>IK</li><li>Vision</li></ul>
-        </article>
-        <article class="card">
-          <span class="mono">Hardware</span>
-          <h3>Prometheus S3</h3>
-          <p class="what">ESP32-S3 development board</p>
-          <p>Custom PCB with native USB-C JTAG and serial, a clean LDO power rail for Wi-Fi bursts, 50 Ω matched antenna traces and auto-reset flashing.</p>
-          <ul class="chips"><li>KiCad</li><li>ESP32-S3</li><li>RF</li></ul>
-        </article>
-        <article class="card">
-          <span class="mono">Hardware</span>
-          <h3>FPGA RC Fleet</h3>
-          <p class="what">Control latency across architectures</p>
-          <p>The same vehicle driven by FPGA, STM32, ESP8266 and Arduino to compare reaction times, plus an Audio-Bot that steers by directional sound.</p>
-          <ul class="chips"><li>Verilog</li><li>STM32</li><li>C++</li></ul>
-        </article>
-        <article class="card">
-          <span class="mono">Robotics</span>
-          <h3>Pi Flight Controller</h3>
-          <p class="what">Drone control from first principles</p>
-          <p>No Betaflight: a raw C++ PID loop on the Raspberry Pi for 6-axis stabilisation, tuned for microsecond loop times.</p>
-          <ul class="chips"><li>C++</li><li>PID</li><li>Linux</li></ul>
-        </article>
-        <article class="card">
-          <span class="mono">AI Infrastructure</span>
-          <h3>Viv</h3>
-          <p class="what">Private, fully offline AI server</p>
-          <p>Local models behind a VPN and reverse proxy, GraphRAG over a knowledge graph, and near real-time voice via Whisper and TTS.</p>
-          <ul class="chips"><li>Ollama</li><li>Qdrant</li><li>n8n</li><li>Docker</li></ul>
-        </article>
-        <article class="card">
-          <span class="mono">Open Source</span>
-          <h3>VTOP MCP Server</h3>
-          <p class="what">VIT Bhopal's student portal for AI agents</p>
-          <p>19 tools that let Claude and other agents read attendance, marks, timetable and exams, with bunk and OD calculators.</p>
-          <ul class="chips"><li>MCP</li><li>Python</li></ul>
-          <a class="more" href="https://github.com/divyarthjain/vtop-bhopal-mcp">View on GitHub →</a>
-        </article>
-        <article class="card">
-          <span class="mono">IoT</span>
-          <h3>AI CCTV Mesh</h3>
-          <p class="what">Decentralised security grid</p>
-          <p>Low-cost ESP32-CAM nodes on a custom protocol, with a Raspberry Pi hub running real-time pattern recognition.</p>
-          <ul class="chips"><li>ESP32-CAM</li><li>Python</li></ul>
-        </article>
-        <article class="card">
-          <span class="mono">HealthTech</span>
-          <h3>JEEVAN</h3>
-          <p class="what">Emergency trauma response</p>
-          <p>Identifies trauma victims by biometrics and routes them to hospitals with verified free beds. In simulation, identification to admission fell under 20 minutes.</p>
-          <ul class="chips"><li>React Native</li><li>Node.js</li><li>Geo APIs</li></ul>
-        </article>
+      <div class="head">
+        <p class="label">PCB design · KiCad 10</p>
+        <h2>The board behind<br>the joints</h2>
+        <p>A servo driver that also lets the robot feel: every joint reports its angle and its motor current back to a Raspberry Pi.</p>
       </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap idea">
-      <div>
-        <span class="mono">Why "negentropy"</span>
-        <h2>Machines that make order out of chaos</h2>
-        <p>Left alone, everything drifts toward disorder. Physicists call that entropy. A robot is a small engine that pushes the other way: it sorts, builds, carries and repairs. That push is negentropy, and it is what we build for.</p>
+      <div class="wall">
+        <figure class="tile paper s-full">
+          <img src="assets/schematic.png" alt="KiCad schematic of the six-servo driver and sensor-feedback board." loading="lazy">
+          <span class="tag">Schematic Rev 3</span>
+          <figcaption><b>Six-servo driver + sensor feedback</b><span>PCA9685 drive · MCP6004 current sensing · two MCP3008 ADCs · reverse-polarity and surge protection.</span></figcaption>
+        </figure>
       </div>
-      <img src="img/maxwell-demon.png" width="1280" height="472" alt="Maxwell's demon sorting fast and slow molecules between two chambers">
-    </div>
-  </section>
-
-  <section id="team">
-    <div class="wrap">
-      <span class="mono">Team</span>
-      <h2>Who is building this</h2>
-      <div class="team">
-        <div>
-          <div class="avatar" aria-hidden="true">DJ</div>
-          <h3>Divyarth Jain</h3>
-          <div class="mono">Founder</div>
-          <div class="social">
-            <a href="https://github.com/divyarthjain">GitHub</a>
-            <a href="https://linkedin.com/in/divyarth-jain">LinkedIn</a>
-          </div>
+      <div class="nums">
+        <div><b>6</b><span>servos driven over I²C</span></div>
+        <div><b>12</b><span>feedback channels: angle + current per joint</span></div>
+        <div><b>3.02 V</b><span>at 1 A: 0.15 Ω shunt × gain of 20.1</span></div>
+        <div><b>~1 mA</b><span>current resolution per ADC step</span></div>
+      </div>
+      <div class="wall" style="margin-top:10px">
+        <figure class="tile paper s-wide" style="grid-row: span 5">
+          <img src="assets/signal_chain_block_diagram.png" alt="Signal chain: servo current and position into ADCs and the Raspberry Pi, which drives the PCA9685." loading="lazy">
+          <figcaption><b>Signal chain</b><span>I²C out to the servos, SPI back from the sensors.</span></figcaption>
+        </figure>
+        <div class="textcard s-mid" style="grid-row: span 5">
+          <p class="label">Also on the bench</p>
+          <h3>ESP-NOW voice intercom</h3>
+          <p>Two ESP32-S3 walkie-talkies with no router: I²S mic in, class-D speaker out, about 80–90 ms mouth to ear.</p>
+          <h3 style="margin-top:8px">Prometheus S3</h3>
+          <p>ESP32-S3 dev board with native USB-C debugging and auto-reset flashing.</p>
         </div>
-        <ul>
-          <li>B.Tech, Electronics &amp; Communication (AI &amp; Cybernetics), VIT Bhopal.</li>
-          <li>Robotics, embedded firmware, PCB design and applied AI, end to end.</li>
-          <li>President, A.I.E.M. Club: runs embedded AI, PCB and robotics workshops for 100+ students.</li>
-          <li>AI Product Intern, QSC Cloud (2025): video personalisation and ML pipelines.</li>
-          <li>Finalist, Caterpillar Autonomy Challenge at IIT Madras, with the rover team.</li>
-        </ul>
       </div>
     </div>
   </section>
 
-  <div class="wrap" id="contact">
-    <div class="cta">
-      <span class="mono" style="color:#cfc4ae">Contact</span>
-      <h2>Let's build something that moves.</h2>
-      <p>Collaborations, research, pilots or just a good robotics problem: write to us.</p>
-      <a class="btn" href="mailto:divyarth@divyarth.online">divyarth@divyarth.online</a>
+  <!-- ARM + CAPSTONE -->
+  <section id="capstone">
+    <div class="wrap">
+      <div class="head">
+        <p class="label">Capstone · 2026</p>
+        <h2>Robots that learn<br>from surprise</h2>
+        <p>The robot predicts what its motors should feel. When reality disagrees, it retrains itself on board, only then. Sim results below; hardware next.</p>
+      </div>
+      <div class="wall">
+        <figure class="tile s-tall" style="grid-row: span 12">
+          <video src="assets/arm-build.mp4" poster="assets/arm-build.jpg" muted loop playsinline preload="metadata"></video>
+          <span class="tag">Video</span>
+          <figcaption><b>The arm build</b><span>Servo arm on a 16-channel PWM driver.</span></figcaption>
+        </figure>
+        <figure class="tile s-wide paper">
+          <video src="assets/capstone-arm.mp4" poster="assets/capstone-arm.jpg" muted loop playsinline preload="metadata" style="object-fit:contain"></video>
+          <span class="tag">Sim</span>
+          <figcaption><b>Feeling a payload</b><span>The model predicts motor current; a hidden weight spikes the surprise and it adapts.</span></figcaption>
+        </figure>
+        <figure class="tile s-wide paper">
+          <video src="assets/capstone-live.mp4" poster="assets/capstone-live.jpg" muted loop playsinline preload="metadata" style="object-fit:contain"></video>
+          <span class="tag">Real model run</span>
+          <figcaption><b>Surprise, then recovery</b><span>World model run: the world changes, surprise jumps, online learning brings it back down.</span></figcaption>
+        </figure>
+        <figure class="tile s-full" style="grid-row: span 8">
+          <video src="assets/lab-desk.mp4" poster="assets/lab-desk.jpg" muted loop playsinline preload="metadata"></video>
+          <span class="tag">Video</span>
+          <figcaption><b>On the lab bench</b><span>The arm wired up next to the workstation.</span></figcaption>
+        </figure>
+      </div>
+      <div class="nums">
+        <div><b>~4×</b><span>less training compute than learning all the time</span></div>
+        <div><b>2.7×</b><span>lower surprise after a sudden change than a frozen model</span></div>
+        <div><b>0</b><span>drift while nothing changes</span></div>
+        <div><b>10</b><span>random seeds per result (simulation)</span></div>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <!-- RESEARCH -->
+  <section id="research">
+    <div class="wrap">
+      <div class="head">
+        <p class="label">Research · chips</p>
+        <h2>Below the<br>transistor</h2>
+      </div>
+      <div class="wall">
+        <figure class="tile paper s-half" style="grid-row: span 8">
+          <img src="assets/poster-nccmos.jpg" alt="Poster: stability-aware NC-CMOS logic design." loading="lazy">
+          <span class="tag">Paper accepted</span>
+          <figcaption><b>NC-CMOS logic</b><span>One sizing rule for ferroelectric transistors, checked in 2,270 transistor-level runs.</span></figcaption>
+        </figure>
+        <figure class="tile paper s-half" style="grid-row: span 8">
+          <img src="assets/poster-fpga.jpg" alt="Poster: an adaptive FPGA AI accelerator that spends compute only where needed." loading="lazy">
+          <span class="tag">Poster</span>
+          <figcaption><b>Adaptive FPGA accelerator</b><span>Cuts compute about 7× with under 1% accuracy loss (emulated).</span></figcaption>
+        </figure>
+      </div>
+      <div class="paperline">
+        <p><span class="chip">Accepted · to appear</span></p>
+        <h3>Stability-Aware NC-CMOS Logic Design Through Ferroelectric Capacitance Matching: A Landau–Khalatnikov-Based Parametric Study</h3>
+        <p class="label" style="text-transform:none;letter-spacing:.02em">A. Chouksey, D. Joshi, D. Jain, A. Beohar, A. Rawat, K. Khare · Paper ID 2381</p>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <span>© 2026 Divyarth Labs · Bhopal, India</span>
-    <span>Images: U.S. Patent 613,809 (public domain); <a href="https://commons.wikimedia.org/wiki/File:Maxwell%27s_demon.svg">Maxwell's demon</a> by Htkym, CC BY 2.5.</span>
+    <h2>Let's build<br><span>something that moves.</span></h2>
+    <div class="contact">
+      <div class="row"><a class="btn" href="assets/Divyarth_Jain_Resume.pdf" target="_blank" rel="noopener">Résumé (PDF)</a><a class="btn ghost" href="https://github.com/divyarthjain" target="_blank" rel="noopener">GitHub</a><a class="btn ghost" href="https://linkedin.com/in/divyarth-jain" target="_blank" rel="noopener">LinkedIn</a></div>
+      <div class="row"><span class="mono">divyarthj24@gmail.com</span><button class="copy" type="button" data-copy="divyarthj24@gmail.com">copy</button></div>
+      <div class="row"><span class="mono">+91 62649 28822 · Bhopal, India</span></div>
+      <p class="label" style="margin:6px 0 0">President, A.I.E.M. Club · teaches PCB design &amp; ESP32</p>
+    </div>
   </div>
 </footer>
-</body>
-</html>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+/* ---------- videos: play only while on screen ---------- */
+(function () {
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var vids = document.querySelectorAll('video');
+  if (reduce || !('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) { var p = e.target.play(); if (p && p.catch) p.catch(function () {}); }
+      else e.target.pause();
+    });
+  }, {threshold: 0.25});
+  vids.forEach(function (v) { io.observe(v); });
+})();
+
+/* ---------- copy button ---------- */
+document.querySelectorAll('.copy').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var t = b.getAttribute('data-copy');
+    try { navigator.clipboard.writeText(t).then(function () { b.textContent = 'copied'; setTimeout(function () { b.textContent = 'copy'; }, 1500); }, function () { b.textContent = 'select it'; }); }
+    catch (e) { b.textContent = 'select it'; }
+  });
+});
+
+/* ---------- 3D hexapod ---------- */
+(function () {
+  var canvas = document.getElementById('hex'), status = document.getElementById('status'), pct = document.getElementById('pct');
+  function fail() { document.getElementById('fallback').hidden = false; canvas.hidden = true; status.innerHTML = 'Video below ↓'; }
+  if (!window.THREE || !THREE.OrbitControls) { fail(); return; }
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true, alpha: true}); } catch (e) { fail(); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  var scene = new THREE.Scene();
+  var cam = new THREE.PerspectiveCamera(32, 1, 5, 6000);
+  cam.position.set(520, 330, 620);
+  var controls = new THREE.OrbitControls(cam, canvas);
+  controls.target.set(0, 40, 0); controls.enableDamping = true; controls.dampingFactor = .08;
+  controls.minDistance = 320; controls.maxDistance = 1500; controls.maxPolarAngle = Math.PI * .49;
+  controls.autoRotate = true; controls.autoRotateSpeed = .7; controls.enablePan = false;
+  var idleTimer; controls.addEventListener('start', function () { controls.autoRotate = false; clearTimeout(idleTimer); });
+  controls.addEventListener('end', function () { idleTimer = setTimeout(function () { controls.autoRotate = true; }, 4000); });
+
+  scene.add(new THREE.HemisphereLight(0xfff4e8, 0x1a1c20, .75));
+  var key = new THREE.DirectionalLight(0xffffff, 1.0); key.position.set(300, 700, 260); key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024); var sc = key.shadow.camera; sc.left = -450; sc.right = 450; sc.top = 450; sc.bottom = -450; sc.near = 100; sc.far = 1600;
+  scene.add(key);
+  var rim = new THREE.DirectionalLight(0xff8a3d, .55); rim.position.set(-500, 200, -400); scene.add(rim);
+
+  // ground: shadow catcher + moving grid (treadmill)
+  var ground = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.ShadowMaterial({opacity: .45}));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  var grid = new THREE.GridHelper(2400, 48, 0x34373c, 0x23262a); grid.material.transparent = true; grid.material.opacity = .7; scene.add(grid);
+
+  function mat(c, o) { return new THREE.MeshStandardMaterial(Object.assign({color: c, roughness: .55, metalness: .05}, o || {})); }
+  var M = {shell: mat(0xECE8E1), accent: mat(0xFF6A1A, {side: THREE.DoubleSide, roughness: .45}), dark: mat(0x2A2C30, {roughness: .7}), servo: mat(0x151618, {roughness: .4}), tip: mat(0xFF6A1A), shellDS: mat(0xECE8E1, {side: THREE.DoubleSide})};
+
+  // geometry from the robot's config (mm): coxa 43, femur 80; leg mounts L1-R1 126, L1-L3 167, L2-R2 163
+  var MOUNTS = [["L1", -63, 83.5, 125], ["L2", -81.5, 0, 180], ["L3", -63, -83.5, 235], ["R1", 63, 83.5, 55], ["R2", 81.5, 0, 0], ["R3", 63, -83.5, -55]];
+  var D = Math.PI / 180;
+  var robot = new THREE.Group(); robot.rotation.x = -Math.PI / 2; scene.add(robot);   // robot is z-up, +y front
+  var body = new THREE.Group(); robot.add(body);
+  var legs = [];
+
+  // parts are packed as int16-quantized vertices + indices (see stl2json.py)
+  var geo = {};
+  function b64(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
+  function decode(d) {
+    var q = new Int16Array(b64(d.pos)), pos = new Float32Array(q.length);
+    for (var i = 0; i < q.length; i++) { var a = i % 3; pos[i] = (q[i] + 32767) * d.scale[a] + d.min[a]; }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setIndex(new THREE.BufferAttribute(d.idx32 ? new Uint32Array(b64(d.idx)) : new Uint16Array(b64(d.idx)), 1));
+    g = g.toNonIndexed(); g.computeVertexNormals();   // flat shading keeps CAD edges crisp
+    return g;
+  }
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'assets/hexapod.json'); xhr.responseType = 'json';
+  xhr.onprogress = function (e) { if (e.lengthComputable) pct.textContent = Math.round(e.loaded / e.total * 100) + '%'; };
+  xhr.onload = function () {
+    var d = xhr.response;
+    if (xhr.status !== 200 || !d) { fail(); return; }
+    try { Object.keys(d).forEach(function (k) { geo[k] = decode(d[k]); }); build(); } catch (e) { fail(); }
+  };
+  xhr.onerror = fail; xhr.send();
+
+  function add(parent, g, m, pos, rot) {
+    var x = new THREE.Mesh(g, m); x.castShadow = true; x.receiveShadow = true;
+    if (pos) x.position.set(pos[0], pos[1], pos[2]); if (rot) x.rotation.set(rot[0], rot[1], rot[2]);
+    parent.add(x); return x;
+  }
+  function servo(parent, pos, rot) { return add(parent, new THREE.BoxGeometry(40.5, 20, 37), M.servo, pos, rot); }
+
+  function build() {
+    add(body, geo["frame"], M.dark);
+    add(body, geo["top-cover"], M.shell, [0, 0, 16]);
+    add(body, geo["bottom-cover"], M.shell);
+    MOUNTS.forEach(function (m) {
+      var sg = m[0][0] === 'L' ? -1 : 1, side = sg < 0 ? 'left' : 'right';
+      var mount = new THREE.Group(); mount.position.set(m[1], m[2], 0); mount.rotation.z = m[3] * D; body.add(mount);
+      servo(mount, [0, 0, 12.5], [0, 0, Math.PI / 2]);
+      var coxa = new THREE.Group(); mount.add(coxa);
+      add(coxa, geo[side + "-coxa"], M.shell);
+      servo(coxa, [43, 0, 12.5], [0, Math.PI / 2, Math.PI / 2]);
+      var femur = new THREE.Group(); femur.position.set(43, 0, 22); coxa.add(femur);
+      add(femur, geo[side + "-femur"], M.accent, [0, sg * 12.5, 0], [Math.PI / 2, 0, 0]);
+      var tibia = new THREE.Group(); tibia.position.set(80, 0, 0); femur.add(tibia);
+      var tm = new THREE.Group(); tm.position.set(-61, -sg * 6.25, 9); tibia.add(tm);
+      add(tm, geo[side + "-tibia"], M.shell);
+      var sh = add(tm, geo["shield"], sg > 0 ? M.shellDS : M.shell); if (sg > 0) sh.scale.y = -1;
+      sh.rotation.z = Math.PI; sh.position.set(6, sg * 12.5, 0);   // cover faces outward
+      add(tm, geo["tip"], M.tip, [2, sg * 6.25, -112], [Math.PI, 0, 0]);
+      servo(tm, [56, sg * 6.25, -18], [0, -57 * D, 0]);
+      var tri = (m[0] === 'L1' || m[0] === 'R2' || m[0] === 'L3') ? 0 : 1;
+      legs.push({name: m[0], sg: sg, coxa: coxa, femur: femur, tibia: tibia, tri: tri, a: {c: 0, f: 20, t: -30}});
+    });
+    status.innerHTML = 'Live 3D · <b>18 servos</b><br>tripod gait';
+    resize(); requestAnimationFrame(tick);
+  }
+
+  // ---- motion ----
+  var mode = 'walk', t = 0, last = performance.now();
+  var bodyRoll = 0, bodyPitch = 0;
+  function ease(u) { return u * u * (3 - 2 * u); }
+  function target(l, time) {
+    var stand = {c: 0, f: 18 + Math.sin(time * 1.6) * 1.5, t: -32};
+    if (mode === 'walk' || mode === 'turn') {
+      var ph = (time * 0.9 + l.tri * 0.5) % 1, swing = ph < .5, u = swing ? ph / .5 : (ph - .5) / .5;
+      var sweep = swing ? -1 + 2 * ease(u) : 1 - 2 * u;
+      var dir = mode === 'turn' ? 1 : l.sg;
+      var lift = swing ? Math.sin(Math.PI * u) : 0;
+      return {c: 15 * sweep * dir, f: 18 + 24 * lift, t: -32 + 14 * lift};
+    }
+    if (mode === 'wave' && l.name === 'R1') {
+      return {c: 18 + 16 * Math.sin(time * 5), f: 78, t: 10 + 22 * Math.sin(time * 5 + 1)};
+    }
+    if (mode === 'wave') return {c: l.name === 'R2' ? -8 : 0, f: 14, t: -34};
+    if (mode === 'dance') {
+      var beat = Math.sin(time * 6 + (l.tri ? Math.PI : 0));
+      return {c: 6 * Math.sin(time * 3), f: 18 + 10 * Math.max(0, beat), t: -32 + 6 * beat};
+    }
+    return stand;
+  }
+  var tmp = new THREE.Vector3();
+  function tick(now) {
+    var dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
+    var k = 1 - Math.pow(.0005, dt);           // smooth blend between modes
+    legs.forEach(function (l) {
+      var g = target(l, t);
+      l.a.c += (g.c - l.a.c) * k; l.a.f += (g.f - l.a.f) * k; l.a.t += (g.t - l.a.t) * k;
+      l.coxa.rotation.z = l.a.c * D; l.femur.rotation.y = -l.a.f * D; l.tibia.rotation.y = l.a.t * D;
+    });
+    var tr = 0, tp = 0;
+    if (mode === 'dance') { tr = .09 * Math.sin(t * 3); tp = .06 * Math.sin(t * 3 + 1.2); }
+    if (mode === 'wave') { tp = -.06; tr = -.05; }
+    bodyRoll += (tr - bodyRoll) * k; bodyPitch += (tp - bodyPitch) * k;
+    body.rotation.set(bodyPitch, bodyRoll, 0);
+    // keep the lowest foot on the ground
+    robot.position.y = 0; robot.updateMatrixWorld(true);
+    var minY = Infinity;
+    legs.forEach(function (l) { l.tibia.localToWorld(tmp.set(-59, 0, -109)); if (tmp.y < minY) minY = tmp.y; });
+    robot.position.y = -minY;
+    // treadmill grid
+    if (mode === 'walk') { grid.position.z = (grid.position.z + dt * 60) % 50; }
+    if (mode === 'turn') { grid.rotation.y -= dt * .25; }
+    controls.update();
+    renderer.render(scene, cam);
+    requestAnimationFrame(tick);
+  }
+
+  function resize() {
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false); cam.aspect = w / h;
+    var wide = w >= 900;
+    controls.target.set(wide ? -170 : 0, wide ? 30 : -60, 0);
+    cam.position.copy(controls.target).add(new THREE.Vector3(520, 330, 620).setLength(wide ? 950 : 1250));
+    cam.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+
+  document.querySelectorAll('.modes button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      mode = b.getAttribute('data-mode');
+      document.querySelectorAll('.modes button').forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+    });
+  });
+})();
+</script>
+</body></html>
