@@ -86,6 +86,8 @@ section { padding-block: clamp(56px, 8vw, 110px) 0; }
 .tile .tag { position: absolute; top: 10px; left: 10px; font: 500 .66rem/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; background: var(--wire); color: #140A04; padding: 5px 7px; }
 .tile.paper { background: #F4F2EE; }
 .tile.paper > img { object-fit: contain; padding: 10px; }
+.tile.wip { background: radial-gradient(120% 70% at 50% 30%, #1C1E22 0%, var(--bg2) 70%); }
+.tile.wip canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .tile.paper figcaption { background: linear-gradient(to top, rgba(8,8,9,.9), rgba(8,8,9,0)); }
 
 /* spans (desktop) */
@@ -123,6 +125,25 @@ footer h2 span { color: var(--wire); }
 .btn { display: inline-block; background: var(--wire); color: #140A04; font: 700 .92rem/1 var(--f-body); padding: 12px 18px; text-decoration: none; }
 .btn.ghost { background: none; color: var(--ink); border: 1px solid var(--line); }
 .copy { font: 500 .72rem/1 var(--f-mono); background: none; border: 1px solid var(--line); color: var(--muted); padding: 4px 7px; cursor: pointer; }
+
+/* ---------- lightbox ---------- */
+.tile.zoomable { cursor: zoom-in; }
+.tile.zoomable:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; }
+.lb { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; }
+.lb-bg { position: absolute; inset: 0; background: rgba(6,6,7,.86); backdrop-filter: blur(6px); }
+.lb-stage { position: relative; background: #000; box-shadow: 0 30px 80px rgba(0,0,0,.6); transform-origin: 0 0; }
+.lb-stage.paper { background: #F4F2EE; }
+.lb-stage img, .lb-stage video { display: block; width: 100%; height: 100%; object-fit: contain; }
+.lb-stage img { cursor: zoom-in; }
+.lb-stage.zoomed { overflow: auto; overscroll-behavior: contain; }
+.lb-stage.zoomed img { width: auto; height: auto; max-width: none; cursor: zoom-out; }
+.lb-hint { font: 400 .74rem/1.4 var(--f-mono); color: var(--muted); margin-left: 10px; }
+.lb-cap { position: relative; margin: 12px 0 0; max-width: min(92vw, 900px); text-align: center; font-size: .92rem; color: #CFCAC2; }
+.lb-cap b { color: var(--ink); font: 700 1.02rem/1.2 var(--f-display); font-stretch: 85%; text-transform: uppercase; margin-right: 8px; }
+.lb-inner { position: relative; display: grid; justify-items: center; }
+.lb-close { position: absolute; top: max(14px, env(safe-area-inset-top, 0px)); right: 16px; z-index: 2; width: 44px; height: 44px;
+  font: 400 1.6rem/1 var(--f-body); color: var(--ink); background: rgba(22,24,27,.8); border: 1px solid var(--line); cursor: pointer; }
+.lb-close:hover { border-color: var(--wire); color: var(--wire); }
 
 @media (max-width: 900px) {
   .wall { grid-auto-rows: 56px; }
@@ -183,7 +204,7 @@ footer h2 span { color: var(--wire); }
       </div>
       <div class="wall">
         <figure class="tile s-tall">
-          <video src="assets/hex-walk.mp4" poster="assets/hex-walk.jpg" muted loop playsinline preload="metadata"></video>
+          <video src="assets/hex-walk.mp4" poster="assets/hex-walk.jpg" muted loop playsinline disableremoteplayback preload="metadata"></video>
           <span class="tag">Video</span>
           <figcaption><b>Walking</b><span>Tripod gait across the lab floor.</span></figcaption>
         </figure>
@@ -196,13 +217,23 @@ footer h2 span { color: var(--wire); }
           <figcaption><b>Debug days</b><span>Gait code on the laptop, robot on the bench.</span></figcaption>
         </figure>
         <figure class="tile s-wide">
-          <video src="assets/hex-table.mp4" poster="assets/hex-table.jpg" muted loop playsinline preload="metadata"></video>
+          <video src="assets/hex-table.mp4" poster="assets/hex-table.jpg" muted loop playsinline disableremoteplayback preload="metadata"></video>
           <span class="tag">Video</span>
           <figcaption><b>Bench test</b><span>Six legs, 18 servos, one very busy wiring harness.</span></figcaption>
         </figure>
         <figure class="tile s-mid">
           <img src="assets/hex_stand.jpg" alt="The hexapod standing on a table, viewed from above." loading="lazy">
           <figcaption><b>Standing pose</b><span>Body level, all six feet down.</span></figcaption>
+        </figure>
+        <figure class="tile s-wide" style="grid-row: span 7">
+          <video src="assets/lab-desk.mp4" poster="assets/lab-desk.jpg" muted loop playsinline disableremoteplayback preload="metadata"></video>
+          <span class="tag">Video</span>
+          <figcaption><b>The workbench</b><span>The wired-up hexapod next to the lab workstation.</span></figcaption>
+        </figure>
+        <figure class="tile s-mid" style="grid-row: span 7">
+          <video src="assets/arm-build.mp4" poster="assets/arm-build.jpg" muted loop playsinline disableremoteplayback preload="metadata"></video>
+          <span class="tag">Video</span>
+          <figcaption><b>Servo test rig</b><span>Propped on a box, legs driven from a 16-channel PWM driver.</span></figcaption>
         </figure>
       </div>
     </div>
@@ -218,12 +249,12 @@ footer h2 span { color: var(--wire); }
       </div>
       <div class="wall">
         <figure class="tile s-wide" style="grid-row: span 7">
-          <video src="assets/hex2-top.mp4" poster="assets/hex2-top.jpg" muted loop playsinline preload="metadata"></video>
+          <video src="assets/hex2-top.mp4" poster="assets/hex2-top.jpg" muted loop playsinline disableremoteplayback preload="metadata"></video>
           <span class="tag">Video</span>
           <figcaption><b>Walking, from above</b><span>Walking across a tiled floor.</span></figcaption>
         </figure>
         <figure class="tile s-tall" style="grid-row: span 13">
-          <video src="assets/hex2-floor.mp4" poster="assets/hex2-floor.jpg" muted loop playsinline preload="metadata" style="object-position: 50% 85%"></video>
+          <video src="assets/hex2-floor.mp4" poster="assets/hex2-floor.jpg" muted loop playsinline disableremoteplayback preload="metadata" style="object-position: 50% 85%"></video>
           <span class="tag">Video</span>
           <figcaption><b>Floor test</b><span>Walking test at home.</span></figcaption>
         </figure>
@@ -289,25 +320,20 @@ footer h2 span { color: var(--wire); }
         <p>The robot predicts what its motors should feel. When reality disagrees, it retrains itself on board, only then. Sim results below; hardware next.</p>
       </div>
       <div class="wall">
-        <figure class="tile s-tall" style="grid-row: span 12">
-          <video src="assets/arm-build.mp4" poster="assets/arm-build.jpg" muted loop playsinline preload="metadata"></video>
-          <span class="tag">Video</span>
-          <figcaption><b>The arm build</b><span>Servo arm on a 16-channel PWM driver.</span></figcaption>
+        <figure class="tile s-tall wip" style="grid-row: span 12">
+          <canvas id="armwip" aria-label="Animated sketch of the planned robot arm doing pick and place. A motor-current graph shows a surprise spike when the box is heavier than predicted, then the prediction catches up."></canvas>
+          <span class="tag">Work in progress</span>
+          <figcaption><b>The arm: next build</b><span>Hardware locked: ST3215-HS bus servos, Raspberry Pi 4B, Pi Camera 2. The brain is tested in sim; the build is underway.</span></figcaption>
         </figure>
         <figure class="tile s-wide paper">
-          <video src="assets/capstone-arm.mp4" poster="assets/capstone-arm.jpg" muted loop playsinline preload="metadata" style="object-fit:contain"></video>
-          <span class="tag">Sim</span>
-          <figcaption><b>Feeling a payload</b><span>The model predicts motor current; a hidden weight spikes the surprise and it adapts.</span></figcaption>
+          <video src="assets/cap-pick.mp4" poster="assets/cap-pick.jpg" muted loop playsinline disableremoteplayback preload="metadata" style="object-fit:contain"></video>
+          <span class="tag">Sim · 4× speed</span>
+          <figcaption><b>Pick and place</b><span>Motor current tells the brain which box it holds: the heavy box is relearned in 2 trials, the light one needs none.</span></figcaption>
         </figure>
         <figure class="tile s-wide paper">
-          <video src="assets/capstone-live.mp4" poster="assets/capstone-live.jpg" muted loop playsinline preload="metadata" style="object-fit:contain"></video>
-          <span class="tag">Real model run</span>
-          <figcaption><b>Surprise, then recovery</b><span>World model run: the world changes, surprise jumps, online learning brings it back down.</span></figcaption>
-        </figure>
-        <figure class="tile s-full" style="grid-row: span 8">
-          <video src="assets/lab-desk.mp4" poster="assets/lab-desk.jpg" muted loop playsinline preload="metadata"></video>
-          <span class="tag">Video</span>
-          <figcaption><b>On the lab bench</b><span>The arm wired up next to the workstation.</span></figcaption>
+          <video src="assets/cap-strike.mp4" poster="assets/cap-strike.jpg" muted loop playsinline disableremoteplayback preload="metadata" style="object-fit:contain"></video>
+          <span class="tag">Sim · 4× speed</span>
+          <figcaption><b>Box strike</b><span>With current sensing it sees a heavier box coming and learns an icy floor in 1 trial instead of 6.</span></figcaption>
         </figure>
       </div>
       <div class="nums">
@@ -359,6 +385,12 @@ footer h2 span { color: var(--wire); }
   </div>
 </footer>
 
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Media viewer">
+  <div class="lb-bg" id="lb-bg"></div>
+  <button class="lb-close" id="lb-close" type="button" aria-label="Close">×</button>
+  <div class="lb-inner"><div class="lb-stage" id="lb-stage"></div><p class="lb-cap" id="lb-cap"></p></div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
 <script>
@@ -384,6 +416,251 @@ document.querySelectorAll('.copy').forEach(function (b) {
     catch (e) { b.textContent = 'select it'; }
   });
 });
+
+/* ---------- lightbox: click a photo or video, it grows from its tile to the centre ---------- */
+(function () {
+  var lb = document.getElementById('lb'), stage = document.getElementById('lb-stage'), cap = document.getElementById('lb-cap');
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var openTile = null, closing = false;
+  var tiles = document.querySelectorAll('.tile');
+  tiles.forEach(function (t) {
+    var m = t.querySelector(':scope > img, :scope > video');
+    if (!m) return;
+    t.classList.add('zoomable'); t.tabIndex = 0; t.setAttribute('role', 'button');
+    var b = t.querySelector('figcaption b');
+    t.setAttribute('aria-label', 'Open ' + (b ? b.textContent : 'media') + ' full size');
+    t.addEventListener('click', function () { open(t, m); });
+    t.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(t, m); } });
+  });
+  function fit(aw, ah) {
+    var mw = Math.min(window.innerWidth * .92, 1400), mh = window.innerHeight * .8;
+    var s = Math.min(mw / aw, mh / ah);
+    return {w: Math.round(aw * s), h: Math.round(ah * s)};
+  }
+  function open(tile, m) {
+    if (openTile) return;
+    openTile = tile;
+    var el, aw, ah;
+    if (m.tagName === 'VIDEO') {
+      el = document.createElement('video');
+      el.src = m.currentSrc || m.src; el.poster = m.poster;
+      el.muted = true; el.defaultMuted = true; el.volume = 0; el.setAttribute('muted', '');
+      el.controls = true; el.playsInline = true; el.loop = true; el.autoplay = true;
+      el.setAttribute('controlsList', 'nodownload noremoteplayback'); el.disablePictureInPicture = true;
+      try { el.currentTime = m.currentTime || 0; } catch (e) {}
+      aw = m.videoWidth || 16; ah = m.videoHeight || 9;
+      m.pause();
+    } else {
+      el = document.createElement('img'); el.src = m.currentSrc || m.src; el.alt = m.alt;
+      aw = m.naturalWidth || 4; ah = m.naturalHeight || 3;
+      el.addEventListener('click', function (e) {   // toggle full-resolution view, scroll to the clicked spot
+        e.stopPropagation();
+        var r = el.getBoundingClientRect(), fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+        var on = stage.classList.toggle('zoomed');
+        if (on) { stage.scrollLeft = fx * el.naturalWidth - stage.clientWidth / 2; stage.scrollTop = fy * el.naturalHeight - stage.clientHeight / 2; }
+      });
+    }
+    var f = fit(aw, ah);
+    stage.innerHTML = ''; stage.appendChild(el);
+    stage.className = 'lb-stage' + (tile.classList.contains('paper') ? ' paper' : '');
+    stage.style.width = f.w + 'px'; stage.style.height = f.h + 'px';
+    var b = tile.querySelector('figcaption b'), sp = tile.querySelector('figcaption span');
+    cap.innerHTML = ''; if (b) { var bb = document.createElement('b'); bb.textContent = b.textContent; cap.appendChild(bb); }
+    if (sp) cap.appendChild(document.createTextNode(sp.textContent));
+    if (el.tagName === 'IMG' && aw > f.w * 1.3) { var h = document.createElement('span'); h.className = 'lb-hint'; h.textContent = 'click to zoom'; cap.appendChild(h); }
+    lb.hidden = false; document.body.style.overflow = 'hidden';
+    if (el.tagName === 'VIDEO') { var pr = el.play(); if (pr && pr.catch) pr.catch(function () {}); }
+    animate(true);
+    document.getElementById('lb-close').focus();
+  }
+  function fromTileTransform() {
+    var r = openTile.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    var sc = Math.min(r.width / s.width, r.height / s.height);
+    var dx = r.left + (r.width - s.width * sc) / 2 - s.left, dy = r.top + (r.height - s.height * sc) / 2 - s.top;
+    return 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')';
+  }
+  function animate(opening, done) {
+    var bg = document.getElementById('lb-bg');
+    if (reduce || !stage.animate) { if (done) done(); return; }
+    var from = fromTileTransform();
+    var kf = opening ? [{transform: from, opacity: .6}, {transform: 'none', opacity: 1}] : [{transform: 'none', opacity: 1}, {transform: from, opacity: 0}];
+    var opt = {duration: opening ? 380 : 260, easing: opening ? 'cubic-bezier(.2,.9,.25,1.12)' : 'cubic-bezier(.4,0,1,1)', fill: 'both'};
+    var a = stage.animate(kf, opt);
+    bg.animate(opening ? [{opacity: 0}, {opacity: 1}] : [{opacity: 1}, {opacity: 0}], {duration: opt.duration, fill: 'both'});
+    cap.animate(opening ? [{opacity: 0}, {opacity: 1}] : [{opacity: 1}, {opacity: 0}], {duration: opt.duration, fill: 'both'});
+    if (done) a.onfinish = done;
+  }
+  function close() {
+    if (!openTile || closing) return;
+    closing = true;
+    var v = stage.querySelector('video'); if (v) v.pause();
+    var tile = openTile;
+    animate(false, function () {
+      lb.hidden = true; stage.innerHTML = ''; document.body.style.overflow = '';
+      stage.getAnimations && stage.getAnimations().forEach(function (x) { x.cancel(); });
+      openTile = null; closing = false; tile.focus();
+      var tv = tile.querySelector('video'); if (tv && !reduce) { var p = tv.play(); if (p && p.catch) p.catch(function () {}); }
+    });
+  }
+  document.getElementById('lb-close').addEventListener('click', close);
+  document.getElementById('lb-bg').addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  window.addEventListener('resize', function () {
+    if (!openTile) return;
+    var m = stage.firstChild; if (!m) return;
+    var f = fit(m.videoWidth || m.naturalWidth || 16, m.videoHeight || m.naturalHeight || 9);
+    stage.style.width = f.w + 'px'; stage.style.height = f.h + 'px';
+  });
+})();
+
+/* ---------- arm: work-in-progress animation ----------
+   A sketch of the planned arm doing pick and place. Every other trial the box is heavy:
+   measured motor current jumps above the prediction (surprise), the brain learns the new
+   load, and the prediction catches up. After 4 trials it forgets and the story replays. */
+(function () {
+  var c = document.getElementById('armwip');
+  if (!c || !c.getContext) return;
+  var ctx = c.getContext('2d');
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 0, H = 0;
+  function size() {
+    var r = c.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height; c.width = Math.round(W * d); c.height = Math.round(H * d);
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+  }
+  var ORANGE = '#FF6A1A', INK = '#F1EEE8', MUTED = '#9A9893', LINE = 'rgba(241,238,232,.07)';
+  // wrist keyframes [t (s), x, y (units of arm reach, y up from shoulder), carrying]
+  var K = [[0, .05, .30, 0], [.8, -.30, .12, 0], [1.3, -.30, -.01, 0], [1.7, -.30, -.01, 1], [2.3, -.30, .17, 1],
+           [3.1, 0, .30, 1], [3.9, .30, .17, 1], [4.4, .30, -.01, 1], [4.8, .30, -.01, 0], [5.3, .30, .12, 0], [6, .05, .30, 0]];
+  var T = 6, LIGHT = .5, HEAVY = 1.6;
+  var belief, trial, hist = [], last = 0, clock = 0, state = 'calm', streak = 0;
+  function reset() { belief = {light: LIGHT, heavy: LIGHT}; trial = 0; hist.length = 0; }
+  reset();
+  function ss(u) { return u * u * (3 - 2 * u); }
+  function wristAt(t) {
+    for (var i = 0; i < K.length - 1; i++) if (t <= K[i + 1][0]) {
+      var a = K[i], b = K[i + 1], u = ss((t - a[0]) / (b[0] - a[0] || 1));
+      return {x: a[1] + (b[1] - a[1]) * u, y: a[2] + (b[2] - a[2]) * u, carry: a[3] && b[3] ? 1 : 0, phase: i};
+    }
+    return {x: K[0][1], y: K[0][2], carry: 0, phase: 0};
+  }
+  function ik(x, y, l1, l2) {   // two-link IK, elbow kept above the line
+    var d = Math.min(Math.hypot(x, y), l1 + l2 - 1e-3), c2 = (d * d - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+    var best = null;
+    [1, -1].forEach(function (sg) {
+      var q2 = sg * Math.acos(Math.max(-1, Math.min(1, c2)));
+      var q1 = Math.atan2(y, x) - Math.atan2(l2 * Math.sin(q2), l1 + l2 * Math.cos(q2));
+      var ey = l1 * Math.sin(q1);
+      if (!best || ey > best.ey) best = {q1: q1, q2: q2, ey: ey};
+    });
+    return best;
+  }
+  function step(dt) {
+    clock += dt;
+    var t = clock % T;
+    if (clock >= T) { clock -= T; trial++; if (trial >= 4) reset(); }
+    var heavy = trial % 2 === 1, key = heavy ? 'heavy' : 'light', load = heavy ? HEAVY : LIGHT;
+    var w = wristAt(t);
+    var measured = .25 + w.carry * load + (Math.random() - .5) * .06;
+    var predicted = .25 + w.carry * belief[key];
+    var gap = measured - predicted;
+    if (gap > .25) { streak++; } else streak = 0;
+    if (streak >= 3) { belief[key] += (load - belief[key]) * Math.min(1, dt * 2.2); state = 'learning'; }
+    else state = gap > .25 ? 'surprise' : 'calm';
+    hist.push([measured, predicted]); if (hist.length > 220) hist.shift();
+    return {t: t, w: w, heavy: heavy, sag: w.carry ? Math.max(0, gap) * .05 : 0};
+  }
+  function draw(f) {
+    ctx.clearRect(0, 0, W, H);
+    // blueprint grid
+    ctx.strokeStyle = LINE; ctx.lineWidth = 1;
+    for (var gx = 0; gx < W; gx += 24) { ctx.beginPath(); ctx.moveTo(gx + .5, 0); ctx.lineTo(gx + .5, H); ctx.stroke(); }
+    for (var gy = 0; gy < H; gy += 24) { ctx.beginPath(); ctx.moveTo(0, gy + .5); ctx.lineTo(W, gy + .5); ctx.stroke(); }
+    var R = Math.min(W * 1.15, H * .55), l1 = R * .3, l2 = R * .3, l3 = R * .07;
+    var tableY = H * .46, sh = {x: W / 2, y: tableY - R * .13}, box = R * .085;
+    var A = W / 2 - R * .3, B = W / 2 + R * .3;
+    // table + pedestal
+    ctx.strokeStyle = 'rgba(241,238,232,.25)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(W * .06, tableY); ctx.lineTo(W * .94, tableY); ctx.stroke();
+    ctx.fillStyle = '#2A2C30'; ctx.fillRect(sh.x - R * .05, sh.y, R * .1, tableY - sh.y);
+    // targets
+    ctx.setLineDash([4, 4]); ctx.strokeStyle = 'rgba(241,238,232,.35)';
+    ctx.strokeRect(B - box / 2, tableY - box, box, box); ctx.setLineDash([]);
+    ctx.font = '500 10px "IBM Plex Mono", monospace'; ctx.fillStyle = MUTED; ctx.textAlign = 'center';
+    ctx.fillText('A', A, tableY + 14); ctx.fillText('B', B, tableY + 14);
+    // arm
+    var wx = sh.x + f.w.x * R, wy = sh.y - (f.w.y - f.sag) * R;
+    var q = ik(wx - sh.x, sh.y - wy, l1, l2);
+    var ex = sh.x + l1 * Math.cos(q.q1), ey = sh.y - l1 * Math.sin(q.q1);
+    var tx = wx, ty = wy + l3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = INK; ctx.lineWidth = R * .045;
+    ctx.beginPath(); ctx.moveTo(sh.x, sh.y); ctx.lineTo(ex, ey); ctx.lineTo(wx, wy); ctx.stroke();
+    ctx.strokeStyle = '#2A2C30'; ctx.lineWidth = R * .02;
+    ctx.beginPath(); ctx.moveTo(sh.x, sh.y); ctx.lineTo(ex, ey); ctx.lineTo(wx, wy); ctx.stroke();
+    ctx.strokeStyle = INK; ctx.lineWidth = R * .022;
+    ctx.beginPath(); ctx.moveTo(wx, wy); ctx.lineTo(tx, ty); ctx.stroke();
+    // gripper fingers
+    var open = f.w.carry ? box * .5 : box * .75;
+    ctx.lineWidth = R * .014;
+    ctx.beginPath(); ctx.moveTo(tx - open, ty); ctx.lineTo(tx + open, ty);
+    ctx.moveTo(tx - open, ty); ctx.lineTo(tx - open, ty + box * .45); ctx.moveTo(tx + open, ty); ctx.lineTo(tx + open, ty + box * .45); ctx.stroke();
+    // box
+    var bx, by;
+    if (f.w.carry) { bx = tx; by = ty + box * .05; }
+    else if (f.t < 1.6) { bx = A; by = tableY - box; }
+    else { bx = B; by = tableY - box; }
+    ctx.fillStyle = f.heavy ? ORANGE : '#CFCAC2';
+    ctx.fillRect(bx - box / 2, by, box, box);
+    ctx.fillStyle = f.heavy ? '#140A04' : '#2A2C30'; ctx.font = '600 ' + Math.max(9, box * .32) + 'px "IBM Plex Mono", monospace';
+    ctx.fillText(f.heavy ? '1.2kg' : '50g', bx, by + box * .62);
+    // joints
+    [[sh.x, sh.y], [ex, ey], [wx, wy]].forEach(function (j) {
+      ctx.fillStyle = '#151618'; ctx.beginPath(); ctx.arc(j[0], j[1], R * .032, 0, 7); ctx.fill();
+      ctx.strokeStyle = ORANGE; ctx.lineWidth = 2; ctx.stroke();
+    });
+    // current graph
+    var gx0 = W * .08, gx1 = W * .92, gy0 = H * .55, gy1 = H * .8, vmax = 2.2;
+    ctx.fillStyle = MUTED; ctx.textAlign = 'left'; ctx.font = '500 10px "IBM Plex Mono", monospace';
+    ctx.fillText('SHOULDER CURRENT (A)', gx0, gy0 - 8);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = state === 'calm' ? MUTED : ORANGE;
+    ctx.fillText(state === 'calm' ? 'CALM' : state === 'surprise' ? 'SURPRISE' : 'LEARNING', gx1, gy0 - 8);
+    ctx.strokeStyle = 'rgba(241,238,232,.2)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(gx0, gy1); ctx.lineTo(gx1, gy1); ctx.moveTo(gx0, gy0); ctx.lineTo(gx0, gy1); ctx.stroke();
+    var n = hist.length, sx = (gx1 - gx0) / 219;
+    function Y(v) { return gy1 - (v / vmax) * (gy1 - gy0); }
+    ctx.fillStyle = 'rgba(255,106,26,.22)';
+    for (var i = 0; i < n; i++) {
+      var h = hist[i]; if (h[0] - h[1] > .25) ctx.fillRect(gx0 + i * sx, Y(h[0]), sx + .5, Y(h[1]) - Y(h[0]));
+    }
+    ctx.lineWidth = 1.6; ctx.strokeStyle = INK; ctx.beginPath();
+    for (i = 0; i < n; i++) { var px = gx0 + i * sx, py = Y(hist[i][0]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke();
+    ctx.setLineDash([5, 4]); ctx.strokeStyle = ORANGE; ctx.beginPath();
+    for (i = 0; i < n; i++) { px = gx0 + i * sx; py = Y(hist[i][1]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.textAlign = 'left'; ctx.fillStyle = INK; ctx.fillText('— measured', gx0, gy1 + 16);
+    ctx.fillStyle = ORANGE; ctx.fillText('- - predicted', gx0 + 92, gy1 + 16);
+    ctx.fillStyle = MUTED; ctx.textAlign = 'right'; ctx.fillText('trial ' + (trial + 1) + '/4', gx1, gy1 + 16);
+  }
+  var visible = true, running = false;
+  function loop(now) {
+    if (!visible) { running = false; return; }
+    var dt = Math.min(.05, (now - last) / 1000 || 0); last = now;
+    draw(step(dt));
+    requestAnimationFrame(loop);
+  }
+  function start() { if (!running && !reduce) { running = true; last = performance.now(); requestAnimationFrame(loop); } }
+  size();
+  if (reduce) { clock = 2.6; trial = 1; for (var k = 0; k < 160; k++) step(1 / 60); draw(step(0)); }
+  else {
+    for (var k2 = 0; k2 < 200; k2++) step(1 / 60);   // pre-fill the graph so the first frame isn't empty
+    draw(step(0));
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) start(); }).observe(c);
+    start();
+  }
+  window.addEventListener('resize', function () { size(); draw(step(0)); });
+})();
 
 /* ---------- 3D hexapod ---------- */
 (function () {
