@@ -62,7 +62,7 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
 .modes button:hover { border-color: var(--muted); }
 .modes button[aria-pressed="true"] { background: var(--wire); border-color: var(--wire); color: #140A04; }
 .hint { font: 400 .74rem/1.4 var(--f-mono); color: var(--muted); }
-.status { position: absolute; right: 16px; top: 16px; font: 500 .72rem/1.3 var(--f-mono); color: var(--muted); text-align: right; }
+.status { position: absolute; right: 16px; top: 16px; font: 500 .72rem/1.3 var(--f-mono); color: var(--muted); text-align: right; pointer-events: none; }
 @media (min-width: 700px) { .status { right: 32px; top: 28px; } }
 .status b { color: var(--wire); font-weight: 500; }
 
@@ -765,6 +765,10 @@ document.querySelectorAll('.copy').forEach(function (b) {
       var tri = (m[0] === 'L1' || m[0] === 'R2' || m[0] === 'L3') ? 0 : 1;
       legs.push({name: m[0], sg: sg, coxa: coxa, femur: femur, tibia: tibia, tri: tri, mx: m[1], my: m[2], yaw: m[3] * D, a: {c: 0, f: .3, t: -.55}});
     });
+    // status is built once; tick() only edits two text nodes, and only when they change
+    // (rewriting innerHTML every frame made Safari drop clicks and drag starts)
+    status.innerHTML = 'Live IK · <b>Tripod gait</b><br><span>3</span> of 6 feet down';
+    stMode = status.querySelector('b').firstChild; stFeet = status.querySelector('span').firstChild;
     resize(); requestAnimationFrame(tick);
   }
 
@@ -848,7 +852,7 @@ document.querySelectorAll('.copy').forEach(function (b) {
     }
     return {P: P, feet: feet};
   }
-  var tmp = new THREE.Vector3();
+  var tmp = new THREE.Vector3(), stMode = null, stFeet = null;
   function tick(now) {
     var dt = Math.min(.05, (now - last) / 1000); last = now; t += dt; modeT += dt;
     var p = plan(modeT), P = p.P;
@@ -878,7 +882,9 @@ document.querySelectorAll('.copy').forEach(function (b) {
       grid.position.z = ((grid.position.z + g.v[1] * dt) % 50 + 50) % 50;
       grid.rotation.y -= g.w * dt;
     }
-    status.innerHTML = 'Live IK · <b>' + (g ? g.name : LABELS[mode]) + '</b><br>' + down + ' of 6 feet down';
+    var label = g ? g.name : LABELS[mode];
+    if (stMode && stMode.nodeValue !== label) stMode.nodeValue = label;
+    if (stFeet && stFeet.nodeValue !== String(down)) stFeet.nodeValue = String(down);
     controls.update();
     renderer.render(scene, cam);
     requestAnimationFrame(tick);
