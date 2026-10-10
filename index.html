@@ -66,13 +66,11 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
 @media (min-width: 900px) { .hex-gate:hover .gate-frame, .hex-gate:focus-visible .gate-frame { inset: 17% 8% 27% 43%; } }
 .gate-ring { width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center; color: var(--wire);
   background: rgba(13,14,16,.55); border: 1.5px solid rgba(241,238,232,.35); transition: background .25s, color .25s, border-color .25s, transform .25s; }
-.gate-ring svg { animation: gateSpin 6s linear infinite; }
 .hex-gate:hover .gate-ring, .hex-gate:focus-visible .gate-ring { background: var(--wire); color: #140A04; border-color: var(--wire); transform: scale(1.06); }
 .gate-title { font: 800 1.05rem/1 var(--f-display); font-stretch: 78%; text-transform: uppercase; letter-spacing: .16em; text-shadow: 0 2px 14px rgba(0,0,0,.7); }
 .gate-sub { font: 400 .72rem/1 var(--f-mono); color: #CFCAC2; letter-spacing: .06em; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
 @keyframes gateBreathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
-@keyframes gateSpin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .gate-frame i, .gate-ring svg { animation: none; } .gate-frame { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .gate-frame i { animation: none; } .gate-frame { transition: none; } }
 .hex-done { position: absolute; right: 16px; top: 56px; font: 600 .8rem/1 var(--f-body); color: var(--ink); background: rgba(22,24,27,.75); border: 1px solid var(--line); padding: 9px 12px; cursor: pointer; }
 @media (min-width: 700px) { .hex-done { right: 32px; top: 70px; } }
 .hex-done:hover { border-color: var(--wire); color: var(--wire); }
@@ -263,7 +261,7 @@ footer h2 span { color: var(--wire); }
   <canvas id="hex" aria-label="Interactive 3D model of an 18-servo hexapod robot. Drag to rotate."></canvas>
   <button type="button" class="hex-gate" id="hex-gate" aria-label="Interact with the 3D hexapod">
     <span class="gate-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-    <span class="gate-ring" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40"><ellipse cx="24" cy="24" rx="19" ry="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M33.5 13.6l5 2.6-2.4 5.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="4" fill="currentColor"/></svg></span>
+    <span class="gate-ring" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></span>
     <span class="gate-title">Click to interact</span>
     <span class="gate-sub">drag to rotate · scroll to zoom</span>
   </button>
