@@ -908,6 +908,7 @@ document.querySelectorAll('.copy').forEach(function (b) {
       var tm = new THREE.Group(); tm.position.set(-61, -sg * 6.25, 9); tflip.add(tm);
       add(tm, geo[side + "-tibia"], M.shell);
       var sh = add(tm, geo["shield"], sg > 0 ? M.shellDS : M.shell); if (sg > 0) sh.scale.y = -1;   // cover as stored, relative to the tibia
+      sh.position.y = sg * 10.5;   // centre it on the tibia (the two STLs are offset ~10.5 mm across the leg)
       add(tm, geo["tip"], M.tip, [2, sg * 6.25, -112], [Math.PI, 0, 0]);
       servo(tm, [56, sg * 6.25, -18], [0, -57 * D, 0]);
       var tri = (m[0] === 'L1' || m[0] === 'R2' || m[0] === 'L3') ? 0 : 1;
