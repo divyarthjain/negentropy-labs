@@ -878,13 +878,16 @@ document.querySelectorAll('.copy').forEach(function (b) {
       var tibia = new THREE.Group(); tibia.position.set(80, 0, 0); femur.add(tibia);
       var tm = new THREE.Group(); tm.position.set(-61, -sg * 6.25, 9); tibia.add(tm);
       add(tm, geo[side + "-tibia"], M.shell);
-      // leg cover: flipped 180 deg about the tibia's own axis (foot -> knee) so it faces out and follows the leg
-      var sh = new THREE.Mesh(geo["shield"], sg > 0 ? M.shellDS : M.shell); sh.castShadow = sh.receiveShadow = true;
-      if (sg > 0) sh.scale.y = -1;
-      var P = new THREE.Vector3(2, sg * 6.25, -110), piv = new THREE.Group();
-      piv.position.copy(P); piv.quaternion.setFromAxisAngle(new THREE.Vector3(59, 0, 101).normalize(), Math.PI);
-      piv.position.y -= sg * 10.75;   // centre the cover on the leg (cover and tibia meshes are offset in y)
-      sh.position.set(-P.x, -P.y, -P.z); piv.add(sh); tm.add(piv);
+      // leg cover: the STL is saved in print orientation, so map its principal axes (long, width, depth)
+      // onto the tibia's (long, in-plane, hinge axis): it lies flat on the leg's side face, notch at the foot
+      var sh = add(tm, geo["shield"], M.shell);
+      var s0 = new THREE.Vector3(-0.305, 0.01, -0.952).normalize(), s1 = new THREE.Vector3(0.018, 1, 0.005), s2 = new THREE.Vector3();
+      s1.sub(s0.clone().multiplyScalar(s1.dot(s0))).normalize(); s2.crossVectors(s0, s1);
+      var t0 = new THREE.Vector3(-0.498, 0, -0.867).normalize(), t1 = new THREE.Vector3(0.867, 0, -0.498).normalize().multiplyScalar(-sg), t2 = new THREE.Vector3().crossVectors(t0, t1);
+      var Rm = new THREE.Matrix4().makeBasis(t0, t1, t2).multiply(new THREE.Matrix4().makeBasis(s0, s1, s2).transpose());
+      sh.quaternion.setFromRotationMatrix(Rm);
+      var cs = new THREE.Vector3(8.7, 4.6, -50.2).applyMatrix4(Rm);   // cover centroid, moved onto the tibia
+      sh.position.set(26.1 + 17.5 * t0.x - cs.x, -sg * 6 - cs.y, -36.3 + 17.5 * t0.z - cs.z);
       add(tm, geo["tip"], M.tip, [2, sg * 6.25, -112], [Math.PI, 0, 0]);
       servo(tm, [56, sg * 6.25, -18], [0, -57 * D, 0]);
       var tri = (m[0] === 'L1' || m[0] === 'R2' || m[0] === 'L3') ? 0 : 1;
