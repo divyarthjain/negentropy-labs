@@ -2,7 +2,7 @@
 <title>Divyarth Jain</title>
 <meta name="description" content="Divyarth Jain builds robots and the boards that run them: hexapods, robot arms, servo driver PCBs.">
 <meta property="og:title" content="Divyarth Jain: robots and the boards that run them">
-<meta property="og:description" content="Hexapods, robot arms, servo driver PCBs, and a capstone robot that learns from surprise.">
+<meta property="og:description" content="Hexapods, PCBs, and a capstone world model small enough to run on a Raspberry Pi.">
 <meta property="og:image" content="https://divyarth.online/assets/og.jpg">
 <meta property="og:url" content="https://divyarth.online/">
 <meta name="twitter:card" content="summary_large_image">
@@ -46,6 +46,23 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
 /* ---------- hero stage ---------- */
 .stage { position: relative; height: clamp(520px, 86vh, 820px); background: radial-gradient(120% 90% at 50% 70%, #1E2024 0%, var(--bg) 70%); overflow: hidden; border-bottom: 1px solid var(--line); }
 #hex { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+/* frosted "click to interact" layer: keeps page scroll from being captured by the 3D view */
+.hex-gate { position: absolute; inset: 0; width: 100%; border: 0; padding: 0; margin: 0; cursor: pointer; color: var(--ink);
+  display: grid; place-content: center; justify-items: center; gap: 10px;
+  background: rgba(13,14,16,.12); -webkit-backdrop-filter: blur(1.6px); backdrop-filter: blur(1.6px);
+  transition: opacity .35s ease, visibility .35s; }
+@media (min-width: 900px) { .hex-gate { padding-left: 34%; } }
+.hex-gate.off { opacity: 0; visibility: hidden; }
+.gate-pill { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; font: 600 .95rem/1 var(--f-body); letter-spacing: .02em;
+  background: rgba(22,24,27,.62); border: 1px solid rgba(241,238,232,.28); box-shadow: 0 0 0 0 rgba(255,106,26,.45); animation: gatePulse 2.4s ease-out infinite; }
+.gate-pill svg { color: var(--wire); }
+.hex-gate:hover .gate-pill, .hex-gate:focus-visible .gate-pill { border-color: var(--wire); }
+.gate-sub { font: 400 .72rem/1 var(--f-mono); color: #CFCAC2; letter-spacing: .04em; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
+@keyframes gatePulse { 0% { box-shadow: 0 0 0 0 rgba(255,106,26,.45); } 70%, 100% { box-shadow: 0 0 0 14px rgba(255,106,26,0); } }
+.hex-done { position: absolute; right: 16px; top: 56px; font: 600 .8rem/1 var(--f-body); color: var(--ink); background: rgba(22,24,27,.75); border: 1px solid var(--line); padding: 9px 12px; cursor: pointer; }
+@media (min-width: 700px) { .hex-done { right: 32px; top: 70px; } }
+.hex-done:hover { border-color: var(--wire); color: var(--wire); }
+@media (prefers-reduced-motion: reduce) { .gate-pill { animation: none; } }
 .stage .fallback { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .35; }
 .hero-copy { position: absolute; left: 0; right: 0; top: 0; pointer-events: none; padding-top: clamp(20px, 4vw, 44px); }
 .hero-copy h1 { font-size: clamp(3.4rem, 13vw, 10.5rem); font-weight: 900; font-stretch: 62%; line-height: .82; letter-spacing: -.01em; text-transform: uppercase; }
@@ -162,6 +179,11 @@ footer h2 span { color: var(--wire); }
 .update { animation: upd 6s ease-in-out infinite; }
 @keyframes upd { 0%, 44% { box-shadow: none; } 50%, 72% { box-shadow: inset 0 0 0 1px var(--wire), 0 0 24px rgba(255,106,26,.25); } 85%, 100% { box-shadow: none; } }
 .side { margin-top: 12px; font-size: .86rem; color: var(--muted); }
+.chainp { margin-bottom: 10px; }
+.chain { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; position: relative; }
+.chain .layer { position: relative; }
+.chain .layer + .layer::before { content: "→"; position: absolute; left: -22px; top: 50%; transform: translateY(-50%); color: var(--wire); font: 600 1rem/1 var(--f-mono); }
+@media (max-width: 700px) { .chain { grid-template-columns: minmax(0, 1fr); gap: 12px; } .chain .layer + .layer::before { content: "↓"; left: 16px; top: -12px; transform: none; } }
 .side b { color: var(--ink); font-weight: 600; }
 /* Pi budget */
 .budget { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 10px; margin-bottom: 10px; }
@@ -226,11 +248,16 @@ footer h2 span { color: var(--wire); }
 <header class="stage" id="top">
   <img class="fallback" id="fallback" src="assets/hex-walk.jpg" alt="" hidden>
   <canvas id="hex" aria-label="Interactive 3D model of an 18-servo hexapod robot. Drag to rotate."></canvas>
+  <button type="button" class="hex-gate" id="hex-gate" aria-label="Interact with the 3D hexapod">
+    <span class="gate-pill"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.6a6 6 0 0 1-4.6-2.2L4.4 15.9a1.6 1.6 0 0 1 2.4-2.1L9 16V11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Click to interact</span>
+    <span class="gate-sub">drag to rotate · scroll to zoom</span>
+  </button>
+  <button type="button" class="hex-done" id="hex-done" hidden>Done</button>
   <div class="hero-copy">
     <div class="wrap">
       <p class="label"><span class="cable" aria-hidden="true"><i></i><i></i><i></i></span>ECE · VIT Bhopal · PCB + robotics</p>
       <h1>Divyarth<span>Jain</span></h1>
-      <p>I build robots and the boards that run them. Drag the hexapod around, or make it dance.</p>
+      <p>I build robots and the boards that run them. Click the hexapod to spin it around, or make it dance.</p>
     </div>
   </div>
   <p class="status" id="status">Loading robot <b id="pct">0%</b><br>18 servos · 3 per leg</p>
@@ -248,7 +275,7 @@ footer h2 span { color: var(--wire); }
         <button type="button" id="m-dance" data-mode="dance" aria-pressed="false">Dance</button>
         <button type="button" id="m-stand" data-mode="stand" aria-pressed="false">Stand</button>
       </div>
-      <p class="hint">Real leg IK in your browser · drag to rotate · scroll to zoom</p>
+      <p class="hint">Real leg IK, live in your browser · click the robot to rotate and zoom</p>
     </div>
   </div>
 </header>
@@ -397,72 +424,76 @@ footer h2 span { color: var(--wire); }
   <section id="capstone">
     <div class="wrap">
       <div class="head">
-        <p class="label">Capstone · 2026</p>
-        <h2>Robots that learn<br>from surprise</h2>
-        <p>A hierarchical vision-language-action stack with a world model that learns from its own surprise, built to run quantized on a Raspberry Pi 4B. The robot predicts what it should see and feel; when reality disagrees, it retrains itself on board, and only then.</p>
+        <p class="label">Capstone · world models · 2026</p>
+        <h2>A world model<br>that fits on a Pi</h2>
+        <p>A world model learns how the world behaves, so a robot can imagine what an action will do before it moves. I'm taking a JEPA world model (LeWorldModel, about 15 M parameters), quantizing it to run on a Raspberry Pi 4B, and letting it keep learning on the robot when the world changes.</p>
       </div>
       <div class="brain">
         <div class="panel">
-          <p class="label">The stack · slow to fast</p>
+          <p class="label">Inside the world model</p>
           <div class="stack">
-            <div class="layer">
-              <div class="meta"><span class="st plan">Planned</span><span>every few seconds</span></div>
-              <h3>Planner · VLM</h3>
-              <p>Camera + a spoken or typed goal → a list of subgoals.</p>
+            <div class="layer wm">
+              <div class="meta"><span class="st ok">Running</span><span>once per camera frame</span></div>
+              <h3>Encode</h3>
+              <p>Camera frame → a compact latent state: 192 numbers that describe the scene.</p>
+            </div>
+            <div class="flow" aria-hidden="true"></div>
+            <div class="layer wm">
+              <div class="meta"><span class="st ok">Running</span><span>every step</span></div>
+              <h3>Predict</h3>
+              <p>Latent state + action → the next latent state. Chain it forward and the robot imagines the future.</p>
             </div>
             <div class="flow" aria-hidden="true"></div>
             <div class="layer">
-              <div class="meta"><span class="st wip">In progress</span><span>fractions of a second</span></div>
-              <h3>Policy · VLA</h3>
-              <p>Subgoal + image → short chunks of arm motion. The world model's predictions keep it honest.</p>
-            </div>
-            <div class="flow" aria-hidden="true"></div>
-            <div class="layer">
-              <div class="meta"><span class="st ok">Working in sim</span><span>every control tick</span></div>
-              <h3>Controller · servos</h3>
-              <p>Joint targets → ST3215-HS bus servos. Encoders, motor current and the camera report back.</p>
+              <div class="meta"><span class="st plan">Next</span><span>before each move</span></div>
+              <h3>Plan in imagination</h3>
+              <p>Try many action sequences inside the model, keep the one whose imagined outcome lands nearest the goal.</p>
             </div>
           </div>
-          <p class="side"><b>Why a hierarchy:</b> the slow layer thinks about the goal, the fast layers keep the arm moving. The world model sits beside all three, checks every step against reality, and is the only part that learns on the robot.</p>
+          <p class="side"><b>Why latent space:</b> it predicts compact features, not pixels, which is what makes imagining cheap enough for a Pi.</p>
         </div>
         <div class="panel">
-          <p class="label">The learning loop · runs beside the stack</p>
+          <p class="label">Keeps learning on the robot</p>
           <div class="loop">
-            <div class="layer wm">
-              <div class="meta"><span class="st ok">Validated in sim</span><span>every step</span></div>
-              <h3>World model</h3>
-              <p>A small JEPA-style model predicts the next state from what the robot sees and does.</p>
-            </div>
-            <div class="flow up" aria-hidden="true"></div>
             <div class="layer">
-              <h3>Surprise</h3>
-              <p>How far reality landed from the prediction.</p>
+              <h3>Imagined vs real</h3>
+              <p>Every step, the prediction is checked against what actually happened.</p>
               <div class="gauge" aria-hidden="true"><i></i><b></b></div>
             </div>
             <div class="flow" aria-hidden="true"></div>
             <div class="layer">
               <h3>Gate</h3>
-              <div class="gate" aria-hidden="true"><span class="shut">calm · frozen</span><span class="open">surprised · learn</span></div>
-              <p>Nothing changes, nothing is trained. Compute is spent only when the world shifts.</p>
+              <div class="gate" aria-hidden="true"><span class="shut">match · frozen</span><span class="open">mismatch · learn</span></div>
+              <p>When the model is right, nothing is trained. Compute is spent only when the world shifts.</p>
             </div>
             <div class="flow" aria-hidden="true"></div>
             <div class="layer update">
+              <div class="meta"><span class="st ok">Validated in sim</span></div>
               <h3>On-board update</h3>
               <p>Only a small slice of the predictor is retrained on the robot: <b>1.33 M of 10.79 M</b> weights.</p>
             </div>
           </div>
         </div>
       </div>
+      <div class="panel chainp">
+        <p class="label">Where it plugs in · the robot stack</p>
+        <div class="chain">
+          <div class="layer"><div class="meta"><span class="st plan">Planned</span></div><h3>Planner · VLM</h3><p>Goal + camera → subgoals</p></div>
+          <div class="layer"><div class="meta"><span class="st wip">In progress</span></div><h3>Policy · VLA</h3><p>Subgoal → arm motion</p></div>
+          <div class="layer"><div class="meta"><span class="st ok">Working in sim</span></div><h3>Controller</h3><p>Joints → ST3215-HS servos</p></div>
+        </div>
+        <p class="side">The world model sits beside all three: it checks each step against reality and is the only part that learns on the robot.</p>
+      </div>
       <div class="budget">
         <div class="panel">
           <p class="label">Target: Raspberry Pi 4B · 8 GB</p>
           <div class="bars">
-            <div class="bar"><div class="row"><span>Surprise check (1 prediction)</span><span>9–23 ms</span></div><div class="track"><i style="left:.6%;width:.9%"></i></div></div>
+            <div class="bar"><div class="row"><span>Imagine one step ahead</span><span>9–23 ms</span></div><div class="track"><i style="left:.6%;width:.9%"></i></div></div>
             <div class="bar"><div class="row"><span>Encode one camera frame</span><span>0.35–0.93 s</span></div><div class="track"><i style="left:23.2%;width:38.7%"></i></div></div>
             <div class="bar"><div class="row"><span>One learning step</span><span>0.55–1.48 s</span></div><div class="track"><i style="left:36.9%;width:61.6%"></i></div></div>
             <div class="axis"><span>0</span><span>0.5 s</span><span>1.0 s</span><span>1.5 s</span></div>
           </div>
-          <p class="side">Full-precision (fp32) estimates from a compute count, scaled to an assumed 3–8 GFLOPS on the Pi's four Cortex-A72 cores. <b>Not measured on the board yet.</b></p>
+          <p class="side">That is roughly <b>40–110 imagined steps per second</b> before any quantization. Full-precision (fp32) estimates from a compute count, scaled to an assumed 3–8 GFLOPS on the Pi's four Cortex-A72 cores. <b>Not measured on the board yet.</b></p>
         </div>
         <div class="panel why">
           <p class="label">Why quantize</p>
@@ -525,7 +556,7 @@ footer h2 span { color: var(--wire); }
       <div class="paperline">
         <p><span class="chip">Accepted · to appear</span></p>
         <h3>Stability-Aware NC-CMOS Logic Design Through Ferroelectric Capacitance Matching: A Landau–Khalatnikov-Based Parametric Study</h3>
-        <p class="label" style="text-transform:none;letter-spacing:.02em">A. Chouksey, D. Joshi, D. Jain, A. Beohar, A. Rawat, K. Khare · Paper ID 2381</p>
+        <p class="label" style="text-transform:none;letter-spacing:.02em">A. Chouksey, D. Joshi, D. Jain, A. Beohar, et al. · Paper ID 2381</p>
       </div>
     </div>
   </section>
@@ -879,6 +910,18 @@ document.querySelectorAll('.copy').forEach(function (b) {
   controls.target.set(0, 40, 0); controls.enableDamping = true; controls.dampingFactor = .08;
   controls.minDistance = 320; controls.maxDistance = 1500; controls.maxPolarAngle = Math.PI * .49;
   controls.autoRotate = true; controls.autoRotateSpeed = .7; controls.enablePan = false;
+  // the 3D view only takes the mouse/touch after a click, so scrolling the page never gets stuck zooming the robot
+  var gate = document.getElementById('hex-gate'), done = document.getElementById('hex-done'), stageEl = document.getElementById('top');
+  function interact(on) {
+    controls.enabled = on; gate.classList.toggle('off', on); gate.tabIndex = on ? -1 : 0; done.hidden = !on;
+    if (on) canvas.focus && canvas.focus({preventScroll: true});
+  }
+  interact(false);
+  gate.addEventListener('click', function () { interact(true); });
+  done.addEventListener('click', function () { interact(false); });
+  stageEl.addEventListener('mouseleave', function () { if (controls.enabled) interact(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && controls.enabled) interact(false); });
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { if (!es[0].isIntersecting && controls.enabled) interact(false); }, {threshold: .35}).observe(stageEl);
   var idleTimer; controls.addEventListener('start', function () { controls.autoRotate = false; clearTimeout(idleTimer); });
   controls.addEventListener('end', function () { idleTimer = setTimeout(function () { controls.autoRotate = true; }, 4000); });
 
