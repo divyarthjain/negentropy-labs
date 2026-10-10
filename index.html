@@ -55,15 +55,13 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
 @media (min-width: 900px) { .hex-gate { padding-left: 34%; background: radial-gradient(circle at 67% 52%, rgba(13,14,16,.62), rgba(13,14,16,0) 200px), rgba(13,14,16,.12); } }
 .hex-gate.off { opacity: 0; visibility: hidden; }
 .hex-gate:focus-visible { outline: none; }
-.gate-frame { position: absolute; inset: 16% 8% 26% 8%; pointer-events: none; transition: inset .45s cubic-bezier(.2,.9,.25,1); }
-@media (min-width: 900px) { .gate-frame { inset: 14% 5% 24% 40%; } }
+.gate-frame { position: absolute; inset: 14px; pointer-events: none; transition: inset .45s cubic-bezier(.2,.9,.25,1); }
 .gate-frame i { position: absolute; width: 26px; height: 26px; border: 0 solid var(--wire); animation: gateBreathe 2.8s ease-in-out infinite; }
 .gate-frame i:nth-child(1) { left: 0; top: 0; border-width: 2px 0 0 2px; }
 .gate-frame i:nth-child(2) { right: 0; top: 0; border-width: 2px 2px 0 0; }
 .gate-frame i:nth-child(3) { left: 0; bottom: 0; border-width: 0 0 2px 2px; }
 .gate-frame i:nth-child(4) { right: 0; bottom: 0; border-width: 0 2px 2px 0; }
-.hex-gate:hover .gate-frame, .hex-gate:focus-visible .gate-frame { inset: 18% 10% 28% 10%; }
-@media (min-width: 900px) { .hex-gate:hover .gate-frame, .hex-gate:focus-visible .gate-frame { inset: 17% 8% 27% 43%; } }
+.hex-gate:hover .gate-frame, .hex-gate:focus-visible .gate-frame { inset: 22px; }
 .gate-ring { width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center; color: var(--wire);
   background: rgba(13,14,16,.55); border: 1.5px solid rgba(241,238,232,.35); transition: background .25s, color .25s, border-color .25s, transform .25s; }
 .hex-gate:hover .gate-ring, .hex-gate:focus-visible .gate-ring { background: var(--wire); color: #140A04; border-color: var(--wire); transform: scale(1.06); }
