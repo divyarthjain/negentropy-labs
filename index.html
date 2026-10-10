@@ -86,6 +86,11 @@ section { padding-block: clamp(56px, 8vw, 110px) 0; }
 .tile .tag { position: absolute; top: 10px; left: 10px; font: 500 .66rem/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; background: var(--wire); color: #140A04; padding: 5px 7px; }
 .tile.paper { background: #F4F2EE; }
 .tile.paper > img { object-fit: contain; padding: 10px; }
+.tile.fit { background: #FFFFFF; } .tile.fit > img { object-fit: contain; padding: 12px 12px 48px; }
+.tile.fit.dark { background: #050505; }
+.sub { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; margin: 34px 0 14px; }
+.sub:first-of-type { margin-top: 6px; }
+.sub h3 { font: 800 clamp(1.5rem, 3vw, 2.1rem)/1 var(--f-display); font-stretch: 72%; text-transform: uppercase; }
 .tile.wip { background: radial-gradient(120% 70% at 50% 30%, #1C1E22 0%, var(--bg2) 70%); }
 .tile.wip canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .tile.paper figcaption { background: linear-gradient(to top, rgba(8,8,9,.9), rgba(8,8,9,0)); }
@@ -333,10 +338,37 @@ footer h2 span { color: var(--wire); }
   <section id="pcb">
     <div class="wrap">
       <div class="head">
-        <p class="label">PCB design · KiCad 10</p>
-        <h2>The board behind<br>the joints</h2>
-        <p>A servo driver that also lets the robot feel: every joint reports its angle and its motor current back to a Raspberry Pi.</p>
+        <p class="label">PCB design · EasyEDA + KiCad</p>
+        <h2>Boards I<br>designed</h2>
+        <p>A 4-layer ESP32-S3 development board built to JLCPCB's design rules, and a servo driver that lets a robot feel its own joints.</p>
       </div>
+
+      <div class="sub"><h3>Prometheus S3</h3><span class="label">4-layer ESP32-S3 dev board</span></div>
+      <div class="wall">
+        <figure class="tile fit s-wide" style="grid-row: span 7">
+          <img src="assets/prom-3d.jpg" alt="3D render of the Prometheus S3 board: purple 4-layer PCB with two USB-C ports, an ESP32-S3 module, boot and reset buttons and two rows of header pins." loading="lazy">
+          <span class="tag">3D render</span>
+          <figcaption><b>Prometheus S3</b><span>ESP32-S3 module, two USB-C ports, boot and reset, 40 breadboard pins.</span></figcaption>
+        </figure>
+        <figure class="tile fit dark s-mid" style="grid-row: span 7">
+          <img src="assets/prom-layout.jpg" alt="PCB layout of the Prometheus S3 board, top copper and silkscreen." loading="lazy">
+          <span class="tag">Layout · 4 layers</span>
+          <figcaption><b>Layout</b><span>Antenna kept clear of copper, USB pairs routed short.</span></figcaption>
+        </figure>
+        <figure class="tile paper s-full" style="grid-row: span 8">
+          <img src="assets/prom-sch.jpg" alt="Schematic of the Prometheus S3: power regulator, ESP32-S3 module, header pins, USB-C OTG and USB-to-UART ports with ESD protection, CP2102N UART bridge and auto-programmer." loading="lazy">
+          <span class="tag">Schematic</span>
+          <figcaption><b>Schematic</b><span>Power · SoC · two USB-C paths with ESD · CP2102N bridge · auto-programmer.</span></figcaption>
+        </figure>
+      </div>
+      <div class="nums">
+        <div><b>4</b><span>layers, built to JLCPCB's stack-up and design rules</span></div>
+        <div><b>2× USB-C</b><span>native USB (OTG) and a CP2102N USB-to-UART port</span></div>
+        <div><b>ESD</b><span>TVS diodes on both ports, Schottky OR-ing of the two 5 V inputs</span></div>
+        <div><b>0</b><span>buttons needed to flash: auto-programmer drives boot and reset</span></div>
+      </div>
+
+      <div class="sub"><h3>Six-servo driver + sensor feedback</h3><span class="label">KiCad 10 · schematic Rev 3</span></div>
       <div class="wall">
         <figure class="tile paper s-full">
           <img src="assets/schematic.png" alt="KiCad schematic of the six-servo driver and sensor-feedback board." loading="lazy">
@@ -351,15 +383,10 @@ footer h2 span { color: var(--wire); }
         <div><b>~1 mA</b><span>current resolution per ADC step</span></div>
       </div>
       <div class="wall" style="margin-top:10px">
-        <figure class="tile paper s-wide" style="grid-row: span 5">
+        <figure class="tile paper s-full" style="grid-row: span 5">
           <img src="assets/signal_chain_block_diagram.png" alt="Signal chain: servo current and position into ADCs and the Raspberry Pi, which drives the PCA9685." loading="lazy">
           <figcaption><b>Signal chain</b><span>I²C out to the servos, SPI back from the sensors.</span></figcaption>
         </figure>
-        <div class="textcard s-mid" style="grid-row: span 5">
-          <p class="label">Also on the bench</p>
-          <h3>Prometheus S3</h3>
-          <p>ESP32-S3 dev board with native USB-C debugging and auto-reset flashing.</p>
-        </div>
       </div>
     </div>
   </section>
@@ -876,18 +903,11 @@ document.querySelectorAll('.copy').forEach(function (b) {
       var femur = new THREE.Group(); femur.position.set(43, 0, 22); coxa.add(femur);
       add(femur, geo[side + "-femur"], M.accent, [0, sg * 12.5, 0], [Math.PI / 2, 0, 0]);
       var tibia = new THREE.Group(); tibia.position.set(80, 0, 0); femur.add(tibia);
-      var tm = new THREE.Group(); tm.position.set(-61, -sg * 6.25, 9); tibia.add(tm);
+      // the tibia hangs on the knee servo turned 180 deg about the vertical (z) axis: foot sits outboard of the knee
+      var tflip = new THREE.Group(); tflip.rotation.z = Math.PI; tibia.add(tflip);
+      var tm = new THREE.Group(); tm.position.set(-61, -sg * 6.25, 9); tflip.add(tm);
       add(tm, geo[side + "-tibia"], M.shell);
-      // leg cover: the STL is saved in print orientation, so map its principal axes (long, width, depth)
-      // onto the tibia's (long, in-plane, hinge axis): it lies flat on the leg's side face, notch at the foot
-      var sh = add(tm, geo["shield"], M.shell);
-      var s0 = new THREE.Vector3(-0.305, 0.01, -0.952).normalize(), s1 = new THREE.Vector3(0.018, 1, 0.005), s2 = new THREE.Vector3();
-      s1.sub(s0.clone().multiplyScalar(s1.dot(s0))).normalize(); s2.crossVectors(s0, s1);
-      var t0 = new THREE.Vector3(-0.498, 0, -0.867).normalize(), t1 = new THREE.Vector3(0.867, 0, -0.498).normalize().multiplyScalar(-sg), t2 = new THREE.Vector3().crossVectors(t0, t1);
-      var Rm = new THREE.Matrix4().makeBasis(t0, t1, t2).multiply(new THREE.Matrix4().makeBasis(s0, s1, s2).transpose());
-      sh.quaternion.setFromRotationMatrix(Rm);
-      var cs = new THREE.Vector3(8.7, 4.6, -50.2).applyMatrix4(Rm);   // cover centroid, moved onto the tibia
-      sh.position.set(26.1 + 17.5 * t0.x - cs.x, -sg * 6 - cs.y, -36.3 + 17.5 * t0.z - cs.z);
+      var sh = add(tm, geo["shield"], sg > 0 ? M.shellDS : M.shell); if (sg > 0) sh.scale.y = -1;   // cover as stored, relative to the tibia
       add(tm, geo["tip"], M.tip, [2, sg * 6.25, -112], [Math.PI, 0, 0]);
       servo(tm, [56, sg * 6.25, -18], [0, -57 * D, 0]);
       var tri = (m[0] === 'L1' || m[0] === 'R2' || m[0] === 'L3') ? 0 : 1;
@@ -902,8 +922,8 @@ document.querySelectorAll('.copy').forEach(function (b) {
 
   // ---- motion: every pose is a foot target in the body frame, solved with leg IK ----
   // Leg geometry (mm): coxa 43, femur 80, tibia 124 to the foot tip; femur pivot 22 above the coxa origin.
-  var COXA = 43, FZ = 22, LF = 80, LT = Math.hypot(59, 109), AT = Math.atan2(-109, -59);
-  var REACH = 165, FOOTZ = -68;
+  var COXA = 43, FZ = 22, LF = 80, LT = Math.hypot(59, 109), AT = Math.atan2(-109, 59);
+  var REACH = 190, FOOTZ = -80;
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function ease(u) { return u * u * (3 - 2 * u); }
   function ik(l, p) {
@@ -1001,7 +1021,7 @@ document.querySelectorAll('.copy').forEach(function (b) {
     // keep the lowest foot on the ground
     robot.position.y = 0; robot.updateMatrixWorld(true);
     var minY = Infinity;
-    legs.forEach(function (l) { l.tibia.localToWorld(tmp.set(-59, 0, -109)); if (tmp.y < minY) minY = tmp.y; });
+    legs.forEach(function (l) { l.tibia.localToWorld(tmp.set(59, 0, -109)); if (tmp.y < minY) minY = tmp.y; });
     robot.position.y = -minY;
     // ground slides under the robot at the body's speed (robot +y is scene -z)
     var g = p.g;
@@ -1023,7 +1043,7 @@ document.querySelectorAll('.copy').forEach(function (b) {
     renderer.setSize(w, h, false); cam.aspect = w / h;
     var wide = w >= 900;
     controls.target.set(wide ? -170 : 0, wide ? 30 : -60, 0);
-    cam.position.copy(controls.target).add(new THREE.Vector3(520, 330, 620).setLength(wide ? 950 : 1250));
+    cam.position.copy(controls.target).add(new THREE.Vector3(520, 330, 620).setLength(wide ? 1150 : 1500));
     cam.updateProjectionMatrix();
   }
   window.addEventListener('resize', resize);
