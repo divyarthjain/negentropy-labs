@@ -343,7 +343,7 @@ footer h2 span { color: var(--wire); }
       <div class="head">
         <p class="label">Hexapod v2 · Dec 2024 – Aug 2025 (approximate)</p>
         <h2>Less spaghetti,<br>more spider</h2>
-        <p>Second build, done properly: a printed frame, split power, a heads-up display and an Xbox controller. Open-source hexapod firmware ported to my hardware, with smoother gaits added on top.</p>
+        <p>Second build, done properly: a printed frame, split power, a heads-up display and an Xbox controller. Originally Android-based open-source hexapod firmware, ported to run on an ESP32 plus an RP2040, with smoother gaits added on top.</p>
       </div>
       <div class="wall">
         <figure class="tile s-wide" style="grid-row: span 7">
@@ -380,14 +380,14 @@ footer h2 span { color: var(--wire); }
       <div class="head">
         <p class="label">PCB design · EasyEDA + KiCad</p>
         <h2>Boards I<br>designed</h2>
-        <p>A 4-layer ESP32-S3 development board built to JLCPCB's design rules, and a servo driver that lets a robot feel its own joints.</p>
+        <p>A 4-layer ESP32-S3 development board built to JLCPCB's design rules, and a six-servo driver board that does more than move joints. It measures every servo's angle and motor current and streams both back to a Raspberry Pi, so the robot can sense load, contact and stalls, not just position.</p>
       </div>
 
       <div class="sub"><h3>Prometheus S3</h3><span class="label">4-layer ESP32-S3 dev board</span></div>
       <div class="wall">
         <figure class="tile fit s-wide" style="grid-row: span 7">
           <img src="assets/prom-3d.jpg" alt="3D render of the Prometheus S3 board: purple 4-layer PCB with two USB-C ports, an ESP32-S3 module, boot and reset buttons and two rows of header pins." loading="lazy">
-          <span class="tag">3D render</span>
+          <span class="tag">Prometheus S3</span>
           <figcaption><b>Prometheus S3</b><span>ESP32-S3 module, two USB-C ports, boot and reset, 40 breadboard pins.</span></figcaption>
         </figure>
         <figure class="tile fit dark s-mid" style="grid-row: span 7">
@@ -618,10 +618,10 @@ footer h2 span { color: var(--wire); }
   <div class="wrap">
     <h2>Let's build<br><span>something that moves.</span></h2>
     <div class="contact">
-      <div class="row"><a class="btn" href="assets/Divyarth_Jain_Resume.pdf" target="_blank" rel="noopener">Résumé (PDF)</a><a class="btn ghost" href="https://github.com/divyarthjain" target="_blank" rel="noopener">GitHub</a><a class="btn ghost" href="https://linkedin.com/in/divyarth-jain" target="_blank" rel="noopener">LinkedIn</a></div>
+      <div class="row"><a class="btn" href="assets/Divyarth_Jain_Resume.pdf" target="_blank" rel="noopener">Résumé</a><a class="btn ghost" href="https://github.com/divyarthjain" target="_blank" rel="noopener">GitHub</a><a class="btn ghost" href="https://linkedin.com/in/divyarth-jain" target="_blank" rel="noopener">LinkedIn</a></div>
       <div class="row"><span class="mono">divyarthj24@gmail.com</span><button class="copy" type="button" data-copy="divyarthj24@gmail.com">copy</button></div>
       <div class="row"><span class="mono">+91 62649 28822 · Bhopal, India</span></div>
-      <p class="label" style="margin:6px 0 0">President, A.I.E.M. Club · teaches PCB design &amp; ESP32</p>
+      
     </div>
   </div>
 </footer>
