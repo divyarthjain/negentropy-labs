@@ -883,6 +883,7 @@ document.querySelectorAll('.copy').forEach(function (b) {
       if (sg > 0) sh.scale.y = -1;
       var P = new THREE.Vector3(2, sg * 6.25, -110), piv = new THREE.Group();
       piv.position.copy(P); piv.quaternion.setFromAxisAngle(new THREE.Vector3(59, 0, 101).normalize(), Math.PI);
+      piv.position.y -= sg * 10.75;   // centre the cover on the leg (cover and tibia meshes are offset in y)
       sh.position.set(-P.x, -P.y, -P.z); piv.add(sh); tm.add(piv);
       add(tm, geo["tip"], M.tip, [2, sg * 6.25, -112], [Math.PI, 0, 0]);
       servo(tm, [56, sg * 6.25, -18], [0, -57 * D, 0]);
