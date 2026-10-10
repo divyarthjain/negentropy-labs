@@ -48,21 +48,34 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
 #hex { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
 /* frosted "click to interact" layer: keeps page scroll from being captured by the 3D view */
 .hex-gate { position: absolute; inset: 0; width: 100%; border: 0; padding: 0; margin: 0; cursor: pointer; color: var(--ink);
-  display: grid; place-content: center; justify-items: center; gap: 10px;
-  background: rgba(13,14,16,.12); -webkit-backdrop-filter: blur(1.6px); backdrop-filter: blur(1.6px);
-  transition: opacity .35s ease, visibility .35s; }
-@media (min-width: 900px) { .hex-gate { padding-left: 34%; } }
+  display: grid; place-content: center; justify-items: center; gap: 12px;
+  background: radial-gradient(circle at 50% 52%, rgba(13,14,16,.62), rgba(13,14,16,0) 190px), rgba(13,14,16,.12);
+  -webkit-backdrop-filter: blur(1.6px); backdrop-filter: blur(1.6px);
+  transition: opacity .4s ease, visibility .4s; }
+@media (min-width: 900px) { .hex-gate { padding-left: 34%; background: radial-gradient(circle at 67% 52%, rgba(13,14,16,.62), rgba(13,14,16,0) 200px), rgba(13,14,16,.12); } }
 .hex-gate.off { opacity: 0; visibility: hidden; }
-.gate-pill { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; font: 600 .95rem/1 var(--f-body); letter-spacing: .02em;
-  background: rgba(22,24,27,.62); border: 1px solid rgba(241,238,232,.28); box-shadow: 0 0 0 0 rgba(255,106,26,.45); animation: gatePulse 2.4s ease-out infinite; }
-.gate-pill svg { color: var(--wire); }
-.hex-gate:hover .gate-pill, .hex-gate:focus-visible .gate-pill { border-color: var(--wire); }
-.gate-sub { font: 400 .72rem/1 var(--f-mono); color: #CFCAC2; letter-spacing: .04em; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
-@keyframes gatePulse { 0% { box-shadow: 0 0 0 0 rgba(255,106,26,.45); } 70%, 100% { box-shadow: 0 0 0 14px rgba(255,106,26,0); } }
+.hex-gate:focus-visible { outline: none; }
+.gate-frame { position: absolute; inset: 16% 8% 26% 8%; pointer-events: none; transition: inset .45s cubic-bezier(.2,.9,.25,1); }
+@media (min-width: 900px) { .gate-frame { inset: 14% 5% 24% 40%; } }
+.gate-frame i { position: absolute; width: 26px; height: 26px; border: 0 solid var(--wire); animation: gateBreathe 2.8s ease-in-out infinite; }
+.gate-frame i:nth-child(1) { left: 0; top: 0; border-width: 2px 0 0 2px; }
+.gate-frame i:nth-child(2) { right: 0; top: 0; border-width: 2px 2px 0 0; }
+.gate-frame i:nth-child(3) { left: 0; bottom: 0; border-width: 0 0 2px 2px; }
+.gate-frame i:nth-child(4) { right: 0; bottom: 0; border-width: 0 2px 2px 0; }
+.hex-gate:hover .gate-frame, .hex-gate:focus-visible .gate-frame { inset: 18% 10% 28% 10%; }
+@media (min-width: 900px) { .hex-gate:hover .gate-frame, .hex-gate:focus-visible .gate-frame { inset: 17% 8% 27% 43%; } }
+.gate-ring { width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center; color: var(--wire);
+  background: rgba(13,14,16,.55); border: 1.5px solid rgba(241,238,232,.35); transition: background .25s, color .25s, border-color .25s, transform .25s; }
+.gate-ring svg { animation: gateSpin 6s linear infinite; }
+.hex-gate:hover .gate-ring, .hex-gate:focus-visible .gate-ring { background: var(--wire); color: #140A04; border-color: var(--wire); transform: scale(1.06); }
+.gate-title { font: 800 1.05rem/1 var(--f-display); font-stretch: 78%; text-transform: uppercase; letter-spacing: .16em; text-shadow: 0 2px 14px rgba(0,0,0,.7); }
+.gate-sub { font: 400 .72rem/1 var(--f-mono); color: #CFCAC2; letter-spacing: .06em; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
+@keyframes gateBreathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes gateSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .gate-frame i, .gate-ring svg { animation: none; } .gate-frame { transition: none; } }
 .hex-done { position: absolute; right: 16px; top: 56px; font: 600 .8rem/1 var(--f-body); color: var(--ink); background: rgba(22,24,27,.75); border: 1px solid var(--line); padding: 9px 12px; cursor: pointer; }
 @media (min-width: 700px) { .hex-done { right: 32px; top: 70px; } }
 .hex-done:hover { border-color: var(--wire); color: var(--wire); }
-@media (prefers-reduced-motion: reduce) { .gate-pill { animation: none; } }
 .stage .fallback { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .35; }
 .hero-copy { position: absolute; left: 0; right: 0; top: 0; pointer-events: none; padding-top: clamp(20px, 4vw, 44px); }
 .hero-copy h1 { font-size: clamp(3.4rem, 13vw, 10.5rem); font-weight: 900; font-stretch: 62%; line-height: .82; letter-spacing: -.01em; text-transform: uppercase; }
@@ -249,7 +262,9 @@ footer h2 span { color: var(--wire); }
   <img class="fallback" id="fallback" src="assets/hex-walk.jpg" alt="" hidden>
   <canvas id="hex" aria-label="Interactive 3D model of an 18-servo hexapod robot. Drag to rotate."></canvas>
   <button type="button" class="hex-gate" id="hex-gate" aria-label="Interact with the 3D hexapod">
-    <span class="gate-pill"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.6a6 6 0 0 1-4.6-2.2L4.4 15.9a1.6 1.6 0 0 1 2.4-2.1L9 16V11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Click to interact</span>
+    <span class="gate-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="gate-ring" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40"><ellipse cx="24" cy="24" rx="19" ry="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M33.5 13.6l5 2.6-2.4 5.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="4" fill="currentColor"/></svg></span>
+    <span class="gate-title">Click to interact</span>
     <span class="gate-sub">drag to rotate · scroll to zoom</span>
   </button>
   <button type="button" class="hex-done" id="hex-done" hidden>Done</button>
